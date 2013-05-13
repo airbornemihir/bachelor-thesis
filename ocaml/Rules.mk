@@ -30,7 +30,7 @@ include $(dir)/Rules.mk
 # Top level dependencies.
 
 .PHONY: targets
-targets: next_step.native calc.native test.native compare_automata.native
+targets: calc.native test.native compare_automata.native
 
 CALC_NATIVE_DEPS := \
 zone-valuation-graph/calc.ml \
@@ -103,9 +103,8 @@ next_step.native: $(NEXT_STEP_DEPS)
 test.native: $(TEST_DEPS)
 
 %.native: $(COMPARE_AUTOMATA_DEPS) $(CALC_NATIVE_DEPS) \
-	$(NEXT_STEP_DEPS) $(TEST_DEPS)
+	$(TEST_DEPS)
 	$(OCAMLBUILD)  \
-	clutter/next_step/next_step.native \
 	zone-valuation-graph/calc.native \
 	test/test.native \
 	zone-valuation-graph/compare_automata.native
