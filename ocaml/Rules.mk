@@ -18,13 +18,13 @@ dir := fernandez-ocaml-noweb
 include $(dir)/Rules.mk
 dir := grammar-noweb
 include $(dir)/Rules.mk
-dir := next_step
-include $(dir)/Rules.mk
 dir := utilities
 include $(dir)/Rules.mk
 dir := relations
 include $(dir)/Rules.mk
 dir := zone-valuation-graph
+include $(dir)/Rules.mk
+dir := clutter
 include $(dir)/Rules.mk
 
 # Top level dependencies.
@@ -54,7 +54,7 @@ relations/TAOB.ml \
 utilities/Table_using_list.ml
 
 NEXT_STEP_DEPS := \
-next_step/next_step.ml \
+clutter/next_step/next_step.ml \
 $(grammar_types) \
 grammar-noweb/timed_automaton_lexer.mll \
 grammar-noweb/timed_automaton_parser.mly \
@@ -105,7 +105,7 @@ test.native: $(TEST_DEPS)
 %.native: $(COMPARE_AUTOMATA_DEPS) $(CALC_NATIVE_DEPS) \
 	$(NEXT_STEP_DEPS) $(TEST_DEPS)
 	$(OCAMLBUILD)  \
-	next_step/next_step.native \
+	clutter/next_step/next_step.native \
 	zone-valuation-graph/calc.native \
 	test/test.native \
 	zone-valuation-graph/compare_automata.native

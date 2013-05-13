@@ -64,3 +64,4 @@ ocaml/zone-valuation-graph/graph_functions.ml
 /ocaml/zone-valuation-graph/ZVG_tree.ml
 /ocaml/zone-valuation-graph/calc.ml
 /ocaml/zone-valuation-graph/compare_automata.ml
+/ocaml/clutter/next_step/next_step.ml
