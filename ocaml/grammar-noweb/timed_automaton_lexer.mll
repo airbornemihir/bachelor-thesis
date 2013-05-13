@@ -35,4 +35,5 @@ exception Eof
 | '>'              { GT }
 | '='              { EQ }
 | "and"            { AND}
+| "AND"            { AND}
 | eof              { EOF }

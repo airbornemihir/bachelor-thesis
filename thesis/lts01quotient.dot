@@ -1,0 +1,33 @@
+digraph "Bisimilarity quotient graph" {
+subgraph cluster_0 { 
+rank = same; 
+"5";
+}
+subgraph cluster_1 { 
+rank = same; 
+"0";
+"1";
+}
+subgraph cluster_2 { 
+rank = same; 
+"6";
+}
+subgraph cluster_3 { 
+rank = same; 
+"2";
+"3";
+"4";
+}
+subgraph cluster_4 { 
+rank = same; 
+"7";
+}
+"5" -> "0" [label = "0",color=crimson]
+"0" -> "1" [label = "0",color=crimson]
+"1" -> "1" [label = "0",color=crimson]
+"5" -> "6" [label = "1",color=navy]
+"4" -> "2" [label = "1",color=navy]
+"6" -> "3" [label = "0",color=crimson]
+"2" -> "3" [label = "1",color=navy]
+"3" -> "4" [label = "1",color=navy]
+}

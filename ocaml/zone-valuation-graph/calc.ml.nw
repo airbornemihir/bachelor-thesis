@@ -1,3 +1,4 @@
+<<calc.ml>>=
 (* File calc.ml *)
 open Parse_timed_automaton
 open Clock_constraint_utilities
@@ -21,7 +22,7 @@ let text_dump ta g =
         Printf.fprintf txt_out "\nlocation: %s\n" (string_of_int i);
         Printf.fprintf txt_out
           "invar: %s\n"
-          (raw_t_to_string ta.clock_names zone.zone_constraint2)
+          (dbm_to_string ta.clock_names zone.zone_constraint2)
         ;
         Printf.fprintf txt_out "trans:\n";
         List.iter
@@ -60,10 +61,15 @@ let _ =
   (*     (Array.to_list g) *)
   (* in *)
   (* let partition = ZVGLTS2.fernandez_specifying_partition l zone_list_list in *)
-  let partition = ZVGLTS2.fernandez l in
   (ZVGLTS2.print_dot
      l
-     partition
      "/tmp/lts.dot");
+  let partition = ZVGLTS2.fernandez l in
+  (ZVGLTS2.print_quotient_dot
+     l
+     partition
+     "/tmp/lts_quotient.dot");
+  let q = ZVGLTS2.quotient_lts l partition in
+  (ZVGQuotientLTS2.print_dot q "/tmp/quotient_lts.dot");
   exit 0
 

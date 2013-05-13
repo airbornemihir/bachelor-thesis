@@ -1,3 +1,4 @@
+<<NRQueue.ml>>=
 open Grammar_types
 
 module type QUEUE_ELEMENT_TYPE =
@@ -28,7 +29,7 @@ module NRQueue =
         then
           queue
         else
-          element::queue
+          queue@[element]
             
       let head queue =
         match queue with

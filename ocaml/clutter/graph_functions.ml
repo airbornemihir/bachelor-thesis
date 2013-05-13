@@ -339,23 +339,22 @@ let generate_zone_valuation_graph ta =
                          (*   zone.zone_constraint1 (\*TODO: make this upward unbounded!*\) *)
                          (*   arrival_zone.zone_constraint1 *)
                          match
-                           (clock_constraint_to_raw_t_option
+                           (clock_constraint_to_dbm_option
                               ta.clock_names
                               zone.zone_constraint1)
                          with
                            None -> false
                          | Some dst ->
                            (match
-                               (clock_constraint_to_raw_t_option
+                               (clock_constraint_to_dbm_option
                                   ta.clock_names
                                   arrival_zone.zone_constraint1)
                             with
                               None -> false
                             | Some src ->
                               (dbm_haveIntersection
-                                 (dbm_up dst (1 + Array.length ta.clock_names))
-                                 src
-                                 (1 + Array.length ta.clock_names))
+                                 (dbm_up dst)
+                                 src)
                            )
                         )
                          zone_list_array.(departure.next_location)

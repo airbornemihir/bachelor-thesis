@@ -1,0 +1,6 @@
+digraph {
+"p1" -> "p2" [label = "a"]
+"p2" -> "p1" [label = "a"]
+"q1" -> "q2" [label = "a"]
+"q2" -> "q1" [label = "a"]
+}

@@ -22,19 +22,17 @@ dir := next_step
 include $(dir)/Rules.mk
 dir := utilities
 include $(dir)/Rules.mk
+dir := relations
+include $(dir)/Rules.mk
+dir := zone-valuation-graph
+include $(dir)/Rules.mk
 
 # Top level dependencies.
 
 .PHONY: targets
-targets: next_step.native calc.native test.native
+targets: next_step.native calc.native test.native compare_automata.native
 
-libzone_stubs.a: \
-c/zone_stubs.mli \
-c/zone.mllib \
-c/zone_stubs.c
-	$(OCAMLBUILD) libzone_stubs.a
-
-calc.native: \
+CALC_NATIVE_DEPS := \
 zone-valuation-graph/calc.ml \
 zone-valuation-graph/ZVG_modules.ml \
 zone-valuation-graph/ZVG_tree.ml \
@@ -47,7 +45,15 @@ Rules.mk \
 _tags \
 myocamlbuild.ml
 
-next_step.native: \
+COMPARE_AUTOMATA_DEPS := \
+zone-valuation-graph/compare_automata.ml \
+relations/Relations.ml \
+relations/STAB.ml \
+relations/TADB.ml \
+relations/TAOB.ml \
+utilities/Table_using_list.ml
+
+NEXT_STEP_DEPS := \
 next_step/next_step.ml \
 $(grammar_types) \
 grammar-noweb/timed_automaton_lexer.mll \
@@ -61,7 +67,7 @@ Rules.mk \
 _tags\
 myocamlbuild.ml
 
-test.native: \
+TEST_DEPS := \
 $(grammar_types) \
 utilities/Clock_constraint_utilities.ml \
 utilities/UDBM_utilities.ml \
@@ -72,6 +78,7 @@ zone-valuation-graph/Graph_functions2.ml \
 zone-valuation-graph/Graph_functions2_test.ml \
 clutter/Graph_functions3.ml \
 clutter/Graph_functions3_test.ml \
+clutter/Graph_functions2_clutter.ml \
 c/zone_stubs.c \
 c/zone_stubs.mli \
 c/Zone_stubs_test.ml \
@@ -81,11 +88,27 @@ Rules.mk \
 _tags\
 myocamlbuild.ml
 
-%.native:
+libzone_stubs.a: \
+c/zone_stubs.mli \
+c/zone.mllib \
+c/zone_stubs.c
+	$(OCAMLBUILD) libzone_stubs.a
+
+compare_automata.native: $(COMPARE_AUTOMATA_DEPS)
+
+calc.native: $(CALC_NATIVE_DEPS)
+
+next_step.native: $(NEXT_STEP_DEPS)
+
+test.native: $(TEST_DEPS)
+
+%.native: $(COMPARE_AUTOMATA_DEPS) $(CALC_NATIVE_DEPS) \
+	$(NEXT_STEP_DEPS) $(TEST_DEPS)
 	$(OCAMLBUILD)  \
 	next_step/next_step.native \
 	zone-valuation-graph/calc.native \
-	test/test.native
+	test/test.native \
+	zone-valuation-graph/compare_automata.native
 
 calc.top: \
 zone-valuation-graph/calc.ml \

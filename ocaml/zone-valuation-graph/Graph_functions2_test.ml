@@ -10,7 +10,7 @@ let dim05 = 2
 
 let dbm05 =
   match
-    (constraint_list_to_raw_t_option
+    (constraint_list_to_dbm_option
        dim05
        [(1, 0, false, 8)]
     )
@@ -20,7 +20,7 @@ let dbm05 =
 
 let test67 =
   if
-    verify_raw_t
+    verify_dbm
       dim05
       dbm05
       [(1, 0, false, 8)]
@@ -33,7 +33,7 @@ let dim06 = 2
 
 let dbm06 =
   match
-    (constraint_list_to_raw_t_option
+    (constraint_list_to_dbm_option
        dim06
        [(0, 1, true, -8)]
     )
@@ -43,7 +43,7 @@ let dbm06 =
 
 let test68 =
   if
-    verify_raw_t
+    verify_dbm
       dim06
       dbm06
       [(0, 1, true, -8)]
@@ -56,7 +56,7 @@ let dim07 = 2
 
 let dbm07 =
   match
-    (constraint_list_to_raw_t_option
+    (constraint_list_to_dbm_option
        dim07
        [(1, 0, false, 2)]
     )
@@ -66,7 +66,7 @@ let dbm07 =
 
 let test69 =
   if
-    verify_raw_t
+    verify_dbm
       dim07
       dbm07
       [(1, 0, false, 2)]
@@ -79,7 +79,7 @@ let dim08 = 2
 
 let dbm08 =
   match
-    (constraint_list_to_raw_t_option
+    (constraint_list_to_dbm_option
        dim08
        [(0, 1, true, -2)]
     )
@@ -89,7 +89,7 @@ let dbm08 =
 
 let test70 =
   if
-    verify_raw_t
+    verify_dbm
       dim08
       dbm08
       [(0, 1, true, -2)]
@@ -130,14 +130,40 @@ let test71 =
   then
     "test71 passed"
   else
-    ("test71 failed, dbm are " ^ (string_of_int (List.length found)) ^
-        " in number.\n" ^
-        "test71 failed, dbm are [" ^
-        (String.concat
-           "; "
-           (List.map
-              (function dbm -> raw_t_to_string [|"X"; "Y"|] dbm)
-              (List.filter (function dbm -> not (dbm_isEmpty dbm 2)) found)
-           )
-        )
-     ^ "]")
+    "test71 failed"
+    (* ("test71 failed, dbm are " ^ (string_of_int (List.length found)) ^ *)
+    (*     " in number.\n" ^ *)
+    (*     "test71 failed, dbm are [" ^ *)
+    (*     (String.concat *)
+    (*        "; " *)
+    (*        (List.map *)
+    (*           (function dbm -> dbm_to_string [|"X"; "Y"|] dbm) *)
+    (*           (List.filter (function dbm -> not (dbm_isEmpty dbm)) found) *)
+    (*        ) *)
+    (*     ) *)
+    (*  ^ "]") *)
+
+let ta2 = {
+  numlocations = 1;
+  numtrans = 1;
+  numclocks = 2;
+  numactions = 1;
+  numinit = 0;
+  clock_names = [|"X"; "Y"|];
+  locations =
+    [|
+      {
+        location_index = 0;
+        invariant = [True];
+        departures =
+          [|
+            {
+              action = 0;
+              condition = [Eq("Y", 1)];
+              clock_resets = [|"Y"|];
+              next_location = 0
+            }
+          |]
+      }
+    |]
+}

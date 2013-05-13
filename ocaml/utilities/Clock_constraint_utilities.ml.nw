@@ -1,3 +1,4 @@
+<<Clock_constraint_utilities.ml>>=
 open Grammar_types
 open UDBM_utilities
 
@@ -43,3 +44,32 @@ let clock_constraint_after_clock_resets clock_constraint clock_resets =
   )
   @
     (clock_constraint_without_reset_clocks clock_constraint clock_resets)
+
+let maximum_constant ta =
+  let
+      f clock_constraint =
+    List.fold_left
+      (function max ->
+        function
+        | True
+        | False -> max
+        | Lt (_, n)
+        | Le (_, n)
+        | Eq (_, n)
+        | Ge (_, n)
+        | Gt (_, n) -> if max > n then max else n
+      )
+      0
+      clock_constraint
+  in
+  Array.fold_left
+    (function max -> function location ->
+      Array.fold_left
+        (function max -> function departure ->
+          if (max > f departure.condition) then max else (f departure.condition) 
+        )
+        (if (max > f location.invariant) then max else (f location.invariant))
+        location.departures
+    )
+    0
+    ta.locations

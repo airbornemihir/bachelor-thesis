@@ -119,13 +119,13 @@ type zone_using_list = {
 }
 
 <<grammar_types.ml>>=
-type zone_using_raw_t = {
+type zone_using_dbm = {
   zone_location2: int;
-  zone_constraint2: raw_t
+  zone_constraint2: dbm_struct_t
 }
 
 <<grammar_types.mli>>=
-type zone_using_raw_t = {
+type zone_using_dbm = {
   zone_location2: int;
-  zone_constraint2: raw_t
+  zone_constraint2: dbm_struct_t
 }

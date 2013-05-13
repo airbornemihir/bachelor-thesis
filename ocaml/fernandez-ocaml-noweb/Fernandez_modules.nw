@@ -94,6 +94,7 @@ Data types
 <<Fernandez_modules.ml>>=
   type splitter = Simple of block | Compound of (block * splitter *
                                                    splitter)
+
 @ 
 \end{itemize}
 Methods
@@ -396,10 +397,42 @@ Methods
     pi
 
 @ 
+\item This function prints a DOT representation of a given LTS.
+<<Fernandez_modules.ml>>=
+  let print_dot l filename = 
+    let
+        out = open_out filename
+    in
+    Printf.fprintf out "digraph {\n";
+    List.iter
+      (function node_ref1 ->
+        Printf.fprintf out "\"%s\";\n" (node_name l node_ref1);
+        List.iter
+          (function a ->
+            List.iter
+              (function node_ref2 ->
+                Printf.fprintf
+                  out
+                  "\"%s\" -> \"%s\" [label = \"%s\"];\n"
+                  (node_name l node_ref2)
+                  (node_name l node_ref1)
+                  (expand_action l a)
+
+              )
+              (in_adjacency l node_ref1 a)
+          )
+          (actions l)
+      )
+      (nodes l);
+    Printf.fprintf out "}\n";
+    flush out;
+    close_out out
+
+@ 
 \item This function prints a DOT representation of the equivalence
   classes given by a partition of the LTS.
 <<Fernandez_modules.ml>>=
-  let print_dot l partition filename =
+  let print_quotient_dot l partition filename =
     let
         out = open_out filename  
     in
@@ -433,7 +466,7 @@ Methods
                   (function successor_node_ref ->
                     Printf.fprintf
                       out
-                      "\"%s\" -> \"%s\" [label = \"%s\"]\n"
+                      "\"%s\" -> \"%s\" [label = \"%s\"];\n"
                       (node_name l successor_node_ref)
                       (node_name l node_ref)
                       (expand_action l a)
@@ -447,7 +480,155 @@ Methods
       )
       partition;
     Printf.fprintf out "}\n";
-    flush out
+    flush out;
+    close_out out
+
+@
+\item This is a somewhat bizarre structure, using the same
+  signature. Let's see if it works.
+<<Fernandez_modules.ml>>=
+  module Quotient_LTS = struct
+    type node_ref_t = int
+    type action_t = LT.action_t
+    type node = {
+      node_ref_list: LT.node_ref_t list;
+      in_adjacencies: (action_t *(node_ref_t list)) list
+    }
+    type lts_t = {nodes: node array; original: LT.lts_t}
+    let node_equality l node_ref1 node_ref2 =
+      (List.length l.nodes.(node_ref1).node_ref_list
+       =
+          List.length l.nodes.(node_ref2).node_ref_list
+      )
+      &&
+        (List.for_all
+           (function n1 ->
+             List.length
+               (List.filter
+                  (LT.node_equality l.original n1)
+                  l.nodes.(node_ref2).node_ref_list
+               )
+               =
+               List.length
+                 (List.filter
+                    (LT.node_equality l.original n1)
+                    l.nodes.(node_ref1).node_ref_list
+                 )
+           )
+           l.nodes.(node_ref1).node_ref_list
+        )
+    let node_name l node_ref =
+      "[" ^
+        (String.concat
+           "; "
+           (List.map
+              (LT.node_name l.original)
+              (l.nodes.(node_ref).node_ref_list)
+           )
+        )
+      ^ "]"
+    let expand_action l a = LT.expand_action l.original a
+    let nodes l =
+      Array.to_list (Array.init (Array.length l.nodes) (function i ->
+    i))
+    let actions l = LT.actions l.original
+    let in_adjacency l node_ref a =
+      try
+        List.assoc
+          a
+          l.nodes.(node_ref).in_adjacencies
+      with
+        Not_found -> []
+  end
+
+  let quotient_lts l pi = {
+    Quotient_LTS.original = l;
+    Quotient_LTS.nodes =
+      let
+          node_ref_list_array =
+        Array.of_list
+          (List.map
+             (function block -> block.node_refs)
+             pi
+          )
+      in
+      let
+          pseudo_quotient =
+        {
+          Quotient_LTS.original = l;
+          Quotient_LTS.nodes =
+            Array.map
+              (function node_ref_list ->
+                {
+                  Quotient_LTS.node_ref_list = node_ref_list;
+                  Quotient_LTS.in_adjacencies = []
+                }
+              )
+              node_ref_list_array
+        }
+      in
+      Array.map
+        (function node_ref_list ->
+          {
+            Quotient_LTS.node_ref_list =
+              node_ref_list;
+            Quotient_LTS.in_adjacencies =
+              List.map
+                (function a ->
+                  (a, 
+                   List.fold_left
+                     (function partial_in_adjacency -> function n1 ->
+                       (List.filter
+                          (function n2 ->
+                            not
+                              (try (
+                            List.exists
+                                 (Quotient_LTS.node_equality
+                                    pseudo_quotient
+                                    n2
+                                 )
+                                 partial_in_adjacency                            )
+                               with
+                               | Invalid_argument s ->
+                                 raise
+                                   (Invalid_argument
+                                      ("We caught this: " ^ s)
+                                   )
+                              )
+                          )
+                          (List.map
+                             (function n2 ->
+                               let index = ref (-1) in
+                               Array.iteri
+                                 (function i -> function n3 ->
+                                   if
+                                     List.exists
+                                       (LT.node_equality l n2)
+                                       n3
+                                   then
+                                     index := i
+                                   else
+                                     ()
+                                 )
+                                 node_ref_list_array;
+                               !index
+                             )
+                             (LT.in_adjacency l n1 a)
+                          )
+                       )
+                       @
+                         partial_in_adjacency
+                     )
+                     []
+                     node_ref_list
+                  )
+                )
+                (LT.actions l)
+          }
+        )
+        node_ref_list_array
+  }
+      
 end
 @ 
 \end{itemize}

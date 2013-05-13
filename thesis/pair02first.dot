@@ -1,0 +1,5 @@
+digraph {
+"0 $X \\geq 0$";
+"1 $X \\geq 0$";
+"0 $X \\geq 0$" -> "1 $X \\geq 0$" [label = "a"];
+}

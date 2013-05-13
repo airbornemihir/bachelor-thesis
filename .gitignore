@@ -10,6 +10,11 @@ _build
 *.snm
 *.toc
 *.vrb
+*.lof
+*.lot
+# Ignore byproducts of bibtex
+*.bbl
+*.blg
 # Ignore native applications.
 *.native
 # Ignore generated files.
@@ -38,3 +43,24 @@ ocaml/zone-valuation-graph/graph_functions.ml
 /ocaml/zone-valuation-graph/.#calc.ml
 /mid-sem-2-presentation/#presentation.lyx#
 /ocaml/fernandez-ocaml-noweb/Fernandez_modules.ml
+/thesis/*.png
+/ocaml/grammar-noweb/examples/*.png
+/thesis/*.pdf
+/presentation/*.pdf
+/thesis/*.pdf_tex
+/presentation/*.pdf_tex
+/ocaml/c/zone_stubs.c
+/ocaml/c/zone_stubs.mli
+/ocaml/relations/Relations.ml
+/ocaml/relations/STAB.ml
+/ocaml/relations/TADB.ml
+/ocaml/relations/TAOB.ml
+/ocaml/utilities/Clock_constraint_utilities.ml
+/ocaml/utilities/NRQueue.ml
+/ocaml/utilities/Table_using_list.ml
+/ocaml/utilities/UDBM_utilities.ml
+/ocaml/zone-valuation-graph/Graph_functions2.ml
+/ocaml/zone-valuation-graph/ZVG_modules.ml
+/ocaml/zone-valuation-graph/ZVG_tree.ml
+/ocaml/zone-valuation-graph/calc.ml
+/ocaml/zone-valuation-graph/compare_automata.ml

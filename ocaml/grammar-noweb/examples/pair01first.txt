@@ -1,0 +1,15 @@
+#locations 2
+#trans 1
+#clocks 1
+#actions 1
+#init 0
+X
+
+location: 0
+invar: TRUE
+trans:
+X > 2 => ACT 0; RESET {}; goto 1
+
+location: 1
+invar: TRUE
+trans:
