@@ -4,14 +4,14 @@
 \usepackage{subfig}
 
 \title{Tools and Algorithms for Deciding Relations on Timed Automata}
-\subtitle{B Tech project, supervised by S Arun-Kumar, verification group}
+\subtitle{B Tech project, supervised by S. Arun-Kumar, verification group}
 \author{Mihir Mehta}
 \institute[IITD]{
   Department of Computer Science and Engineering\\
   Indian Institute of Technology, Delhi\\[1ex]
   \texttt{cs1090197@cse.iitd.ac.in}
 }
-\date[May 2013]{May 12, 2013}
+\date[May 2013]{May 13, 2013}
 
 \begin{document}
 
@@ -57,10 +57,10 @@
     LTS is a strong bisimulation if and only if, for all
     $(s_1, s_2)$ $\epsilon$ $R$ and $a$ $\epsilon$ $Act .$\\
     $\forall s_1' (s_1 \xrightarrow{a} s_1' \Rightarrow \exists s_2'
-    . (s_2 \xrightarrow{a} s_2' \wedge (s_1', s_2')$ $\epsilon$ $R ) )
+    . (s_2 \xrightarrow{a} s_2' \wedge (s_1', s_2') \in R ) )
     \wedge $ \\
     $\forall s_2' (s_2 \xrightarrow{a} s_2' \Rightarrow \exists s_1'
-    . (s_1 \xrightarrow{a} s_1' \wedge (s_1', s_2')$ $\epsilon$ $R ) )$
+    . (s_1 \xrightarrow{a} s_1' \wedge (s_1', s_2') \in R ) )$
   \end{definition}
 
   \begin{definition}
@@ -93,19 +93,20 @@
 
 \begin{frame}{Relations on timed automata}
 \begin{definition}  \label{def:stab} \emph{Strong time abstracted bisimulation}: A binary relation
-  $R$ is a strong time abstracted bisimulation (STaB) if and only if, for all
-  $(s_1, s_2)$ $\epsilon$ $R$ , $a$ $\epsilon$ $Act $, $d$ $\epsilon$ $R_{\ge 0}$\\
+  $R$ over the states of a timed automaton is a strong time abstracted
+  bisimulation (STaB) if and only if, for all
+  $(s_1, s_2) \in R$ , $a \in Act$, $d \in R_{\ge 0}$\\
   $\forall s_1' (s_1 \xrightarrow{a} s_1' \Rightarrow \exists s_2'
-  . (s_2 \xrightarrow{a} s_2' \wedge (s_1', s_2')$ $\epsilon$ $R ) )
+  . (s_2 \xrightarrow{a} s_2' \wedge (s_1', s_2') \in R ) )
   \wedge $ \\
   $\forall s_2' (s_2 \xrightarrow{a} s_2' \Rightarrow \exists s_1'
-  . (s_1 \xrightarrow{a} s_1' \wedge (s_1', s_2')$ $\epsilon$ $R ) ) \wedge $ \\
+  . (s_1 \xrightarrow{a} s_1' \wedge (s_1', s_2') \in R ) ) \wedge $ \\
   $\forall s_1' (s_1 \xrightarrow{d} s_1' \Rightarrow \exists (s_2',
   d')
-  . (s_2 \xrightarrow{d'} s_2' \wedge (s_1', s_2')$ $\epsilon$ $R ) )
+  . (s_2 \xrightarrow{d'} s_2' \wedge (s_1', s_2') \in R ) )
   \wedge $ \\
   $\forall s_2' (s_2 \xrightarrow{d} s_2' \Rightarrow \exists (s_1', d')
-  . (s_1 \xrightarrow{d'} s_1' \wedge (s_1', s_2')$ $\epsilon$ $R ) ) $ \\
+  . (s_1 \xrightarrow{d'} s_1' \wedge (s_1', s_2') \in R ) ) $ \\
 \end{definition}
 
 It can be shown that the union of all strong time abstracted
@@ -116,10 +117,11 @@ It can be shown that the union of all strong time abstracted
 
 \begin{frame}{Relations on timed automata}
 \begin{definition} \label{def:tadb} \emph{Time abstracted delay bisimulation}: A binary relation
-  $R$ is a time abstracted delay bisimulation (TadB) if and only if, for all
-  $(s_1, s_2)$ $\epsilon$ $R$ , $a$ $\epsilon$ $Act $, $d$ $\epsilon$ $R_{\ge 0}$\\
+  $R$ over the states of a timed automaton is a time abstracted delay
+  bisimulation (TadB) if and only if, for all
+  $(s_1, s_2) \in R$ , $a \in Act$, $d \in R_{\ge 0}$\\
   $\forall s_1' (s_1 \xrightarrow{a} s_1' \Rightarrow \exists (s_2', d)
-  . (s_2 \xrightarrow{d} \xrightarrow{a} s_2' \wedge (s_1', s_2')$ $\epsilon$ $R ) )
+  . (s_2 \xrightarrow{d} \xrightarrow{a} s_2' \wedge (s_1', s_2') \in R ) )
   \wedge $ \\
   $\forall s_2' (s_2 \xrightarrow{a} s_2' \Rightarrow \exists (s_1', d)
   . (s_1 \xrightarrow{d} \xrightarrow{a} s_1' \wedge (s_1', s_2')$
@@ -127,10 +129,10 @@ It can be shown that the union of all strong time abstracted
   \wedge $ \\
   $\forall s_1' (s_1 \xrightarrow{d} s_1' \Rightarrow \exists (s_2',
   d')
-  . (s_2 \xrightarrow{d'} s_2' \wedge (s_1', s_2')$ $\epsilon$ $R ) )
+  . (s_2 \xrightarrow{d'} s_2' \wedge (s_1', s_2') \in R ) )
   \wedge $ \\
   $\forall s_2' (s_2 \xrightarrow{d} s_2' \Rightarrow \exists (s_1', d')
-  . (s_1 \xrightarrow{d'} s_1' \wedge (s_1', s_2')$ $\epsilon$ $R ) ) $ \\
+  . (s_1 \xrightarrow{d'} s_1' \wedge (s_1', s_2') \in R ) ) $ \\
 \end{definition}
 
 It can be shown that the
@@ -142,20 +144,21 @@ It can be shown that the
 
 \begin{frame}{Relations on timed automata}
 \begin{definition} \label{def:taob} \emph{Time abstracted observational bisimulation}: A binary relation
-  $R$ is a time abstracted observational bisimulation (TaoB) if and only if, for all
-  $(s_1, s_2)$ $\epsilon$ $R$ , $a$ $\epsilon$ $Act $, $d$ $\epsilon$ $R_{\ge 0}$\\
+  $R$ over the states of a timed automaton is a time abstracted
+  observational bisimulation (TaoB) if and only if, for all
+  $(s_1, s_2) \in R$ , $a \in Act$, $d \in R_{\ge 0}$\\
   $\forall s_1' (s_1 \xrightarrow{a} s_1' \Rightarrow \exists (s_2',
   d, d') . (s_2 \xrightarrow{d} \xrightarrow{a} \xrightarrow{d'} s_2'
-  \wedge (s_1', s_2')$ $\epsilon$ $R ) ) \wedge $ \\
+  \wedge (s_1', s_2') \in R ) ) \wedge $ \\
   $\forall s_2' (s_2 \xrightarrow{a} s_2' \Rightarrow \exists (s_1',
   d, d') . (s_1 \xrightarrow{d} \xrightarrow{a} \xrightarrow{d'} s_1'
-  \wedge (s_1', s_2')$ $\epsilon$ $R ) ) \wedge $ \\
+  \wedge (s_1', s_2') \in R ) ) \wedge $ \\
   $\forall s_1' (s_1 \xrightarrow{d} s_1' \Rightarrow \exists (s_2',
   d')
-  . (s_2 \xrightarrow{d'} s_2' \wedge (s_1', s_2')$ $\epsilon$ $R ) )
+  . (s_2 \xrightarrow{d'} s_2' \wedge (s_1', s_2') \in R ) )
   \wedge $ \\
   $\forall s_2' (s_2 \xrightarrow{d} s_2' \Rightarrow \exists (s_1', d')
-  . (s_1 \xrightarrow{d'} s_1' \wedge (s_1', s_2')$ $\epsilon$ $R ) ) $ \\
+  . (s_1 \xrightarrow{d'} s_1' \wedge (s_1', s_2') \in R ) ) $ \\
 \end{definition}
 
 It can be shown that
@@ -209,8 +212,115 @@ clocks, and a DBM $M = \langle (m_{ij}, \smile _{ij})\rangle _{0 \leq
 
 \section{Algorithms}
 
+\begin{frame}{Creating the minimal zone graph}
+
+\begin{itemize}
+
+\item Origin of this algorithm - \cite{DBLP:conf/cav/GuhaNA12}
+
+\item Minimal zone graph - stability, reachability, minimality.
+
+\item Strategy: forward propagation for reachability and stability,
+  backward propagation for stability.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Creating the minimal zone graph - forward analysis}
+
+\begin{itemize}
+
+\item We use a queue, as in BFS, but we may visit a location multiple
+  times unlike BFS, and unreachable locations may never be visited.
+
+\item Each queue element stores a location
+$l_{succ}$, its predecessor in the current path $l_{pred}$, and the
+transition $t$ from $l_{pred}$ to $l_{succ}$. It
+
+\item Each time a location
+is visited, we create therein, new zones which are reachable from the
+zones of the predecessor. \\
+Thus, for each predecessor zone $(l_{pred}, \zeta _{pred_{i}})$, the
+derived successor zone is $(l_{succ}, \zeta _{succ_{i}})$, where
+
+\begin{displaymath} 
+  \zeta _{succ_{i}} = ((\zeta _{pred_{i}} \uparrow \cap \texttt{t.guard})[\texttt{t.resets} := 0]) \uparrow
+\end{displaymath} 
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[shrink = 10]{Creating the minimal zone graph - forward analysis}
+
+\begin{itemize}
+
+\item Thus, if we let  $(l_{pred}, \zeta _{pred_{i}})$ range over the
+existing zones of $l_{pred}$, and if we let  $(l_{succ}, \zeta
+_{succ_{j}})$ range over the existing zones of $l_{succ}$, then the
+new zones in $l_{succ}$ will cover
+
+\begin{displaymath} 
+  \zeta _{succ_{new}} = (\bigcup _{i} \zeta_{succ_{i}}) - (\bigcup _{j} \zeta_{succ_{j}})
+\end{displaymath} 
+
+\item Since $\zeta _{succ_{new}}$ is not necessarily convex, we may need to
+split it into multiple convex polyhedra before creating the
+corresponding zones in the $l_{succ}$. 
+
+\item We may also need to split it further in order for the zones to
+  be stable with respect to its outgoing edge guards, and also in
+  order to filter out zones which do not satisfy its invariant.
+
+\item We enqueue all the successors if any new zones are created this
+  way, or if we are visiting the initial location for the first time.
+
+\item We terminate when the queue is empty.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[shrink = 10]{Creating the minimal zone graph - backward analysis}
+
+\begin{itemize}
+
+\item We
+iterate through the transitions of the timed automaton, multiple times
+if necessary, splitting the zones of the source of each transition
+with respect to the zones of the transition's target, until we achieve
+stability of each zone of each location.
+
+\item We recall that for stability,
+whenever we have an edge in the zone valuation graph from a zone
+$(l_{pred}, \zeta _{pred})$ to $(l_{succ}, \zeta _{succ})$
+corresponding to a transition $t$ in the timed automaton, we require 
+\begin{displaymath} 
+  \zeta _{pred} \subseteq \texttt{t.guard}
+  \wedge
+  \zeta _{pred} [\texttt{t.resets} := 0] \subseteq \zeta _{succ}
+\end{displaymath} 
+Thus, when this does not hold, we split $(l_{pred}, \zeta _{pred})$
+into
+\begin{displaymath} 
+  (l_{pred}, \zeta _{pred} \cap (\texttt{t.guard} \cap [\texttt{t.resets} := 0] \zeta _{succ}))
+\end{displaymath} 
+(which is convex and has an edge to $(l_{succ}, \zeta _{succ})$)
+and
+\begin{displaymath} 
+  (l_{pred}, \zeta _{pred} - (\texttt{t.guard} \cap [\texttt{t.resets} := 0] \zeta _{succ}))
+\end{displaymath} 
+(which does not have an edge to $(l_{succ}, \zeta _{succ})$ and may
+need to be split into convex zones.) \\
+This generates the zone valuation graph.
+
+\end{itemize}
+
+\end{frame}
+
 \begin{frame}[fragile, shrink=20]
-  \frametitle{Creating the zone valuation graph - forward analysis}
+  \frametitle{Creating the minimal zone graph - forward analysis}
 
   \begin{algorithm2e}[H]
     Initialise the queue $Q$ with a single element $(null, null, l_0)$\;
@@ -236,7 +346,7 @@ clocks, and a DBM $M = \langle (m_{ij}, \smile _{ij})\rangle _{0 \leq
 \end{frame}
 
 \begin{frame}[fragile, shrink=20]
-  \frametitle{Creating the zone valuation graph - backward analysis}
+  \frametitle{Creating the minimal zone graph - backward analysis}
 
   \begin{algorithm2e}[H]
     Set $new\_zone$\;
@@ -251,13 +361,13 @@ clocks, and a DBM $M = \langle (m_{ij}, \smile _{ij})\rangle _{0 \leq
         }
       }
     }
-    Generate $zone\_valuation\_graph$ by applying Fernandez' algorithm to $zone\_graph$\;
+    Generate $minimal\_zone\_graph$ by applying Fernandez' algorithm to $zone\_graph$\;
     Return $zone\_graph$\;
   \end{algorithm2e}
 
 \end{frame}
 
-\begin{frame}{Zone valuation graph example}
+\begin{frame}{Minimal zone graph example}
   \begin{figure}
     \centering
     \def\svgwidth{0.6\columnwidth}
@@ -267,7 +377,7 @@ clocks, and a DBM $M = \langle (m_{ij}, \smile _{ij})\rangle _{0 \leq
   \end{figure}
 \end{frame}
 
-\begin{frame}{Zone valuation graph example}
+\begin{frame}{Minimal zone graph example}
   \begin{figure}
     \centering
     \def\svgwidth{0.4\columnwidth}
@@ -276,7 +386,7 @@ clocks, and a DBM $M = \langle (m_{ij}, \smile _{ij})\rangle _{0 \leq
   \end{figure}
 \end{frame}
 
-\begin{frame}[shrink=20]{Zone valuation graph example}
+\begin{frame}[shrink=20]{Minimal zone graph example}
   \begin{figure}
     \centering
     \def\svgwidth{0.7\columnwidth}
@@ -285,7 +395,7 @@ clocks, and a DBM $M = \langle (m_{ij}, \smile _{ij})\rangle _{0 \leq
   \end{figure}
 \end{frame}
 
-\begin{frame}[shrink=20]{Zone valuation graph example}
+\begin{frame}[shrink=20]{Minimal zone graph example}
   \begin{figure}
     \centering
     \def\svgwidth{0.9\columnwidth}
@@ -294,7 +404,7 @@ clocks, and a DBM $M = \langle (m_{ij}, \smile _{ij})\rangle _{0 \leq
   \end{figure}
 \end{frame}
 
-\begin{frame}[shrink=20]{Zone valuation graph example}
+\begin{frame}[shrink=20]{Minimal zone graph example}
   \begin{figure}
     \centering
     \def\svgwidth{1.2\columnwidth}
@@ -303,7 +413,7 @@ clocks, and a DBM $M = \langle (m_{ij}, \smile _{ij})\rangle _{0 \leq
   \end{figure}
 \end{frame}
 
-\begin{frame}[shrink=60]{Zone valuation graph example}
+\begin{frame}[shrink=60]{Minimal zone graph example}
   \begin{figure}
     \centering
     \def\svgwidth{2.7\columnwidth}
