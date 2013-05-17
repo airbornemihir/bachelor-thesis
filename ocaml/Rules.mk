@@ -7,8 +7,7 @@ OCAMLLIBS := graph
 
 # The next three are to compact some of the dependencies in the top
 # level.
-grammar_types := grammar-noweb/grammar_types.mli \
-grammar-noweb/grammar_types.ml
+grammar_types := grammar-noweb/grammar_types.ml
 
 fernandez := fernandez-ocaml-noweb/Fernandez_modules.ml
 

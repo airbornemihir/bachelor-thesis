@@ -1,20 +1,8 @@
-\subsection{grammar\_types.ml and grammar\_types.ml}
-These files provide the essential datatypes we work with.
-
-<<grammar_types.mli>>=
-open Zone_stubs
+\subsection{grammar\_types.ml}
+This file provides the essential datatypes we work with.
 
 <<grammar_types.ml>>=
 open Zone_stubs
-
-<<grammar_types.mli>>=
-type unit_clock_constraint = True
-		       | False
-		       | Lt of string*int
-		       | Le of string*int
-		       | Eq of string*int
-		       | Ge of string*int
-		       | Gt of string*int
 
 <<grammar_types.ml>>=
 type unit_clock_constraint = True
@@ -25,19 +13,8 @@ type unit_clock_constraint = True
 		       | Ge of string*int
 		       | Gt of string*int
 
-<<grammar_types.mli>>=
-type clock_constraint = unit_clock_constraint list
-
 <<grammar_types.ml>>=
 type clock_constraint = unit_clock_constraint list
-
-<<grammar_types.mli>>=
-type transition = {
-  action: int;
-  condition: clock_constraint;
-  clock_resets: string array;
-  next_location: int
-}
 
 <<grammar_types.ml>>=
 type transition = {
@@ -47,29 +24,11 @@ type transition = {
   next_location: int
 }
 
-<<grammar_types.mli>>=
-type location = {
-  location_index: int;
-  invariant: clock_constraint;
-  departures: transition array
-}
-
 <<grammar_types.ml>>=
 type location = {
   location_index: int;
   invariant: clock_constraint;
   departures: transition array
-}
-
-<<grammar_types.mli>>=
-type timed_automaton = {
-  numlocations: int;
-  numtrans: int;
-  numclocks: int;
-  numactions: int;
-  numinit: int;
-  clock_names: string array;
-  locations: location array
 }
 
 <<grammar_types.ml>>=
@@ -88,30 +47,13 @@ type lbound =
   Lslack of int
 | Lstrict of int
 
-<<grammar_types.mli>>=
-type lbound =
-  Lslack of int
-| Lstrict of int
-
 <<grammar_types.ml>>=
 type zone_using_list = {
   zone_location1: int;
   zone_constraint1: clock_constraint
 }
 
-<<grammar_types.mli>>=
-type zone_using_list = {
-  zone_location1: int;
-  zone_constraint1: clock_constraint
-}
-
 <<grammar_types.ml>>=
-type zone_using_dbm = {
-  zone_location2: int;
-  zone_constraint2: dbm_struct_t
-}
-
-<<grammar_types.mli>>=
 type zone_using_dbm = {
   zone_location2: int;
   zone_constraint2: dbm_struct_t
