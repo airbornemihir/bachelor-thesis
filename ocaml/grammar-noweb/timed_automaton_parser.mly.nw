@@ -1,3 +1,6 @@
+\subsection{timed\_automaton\_parser.mly}
+This file provides the parser for timed automata.
+
 <<timed_automaton_parser.mly>>=
 /* File timed_automaton_parser.mly */
 %token <int> INT
@@ -105,7 +108,10 @@ unit_clock_constraint
 
 transition:
 clock_constraint RARROW ACT INT SEMI RESET LBRACE clock_namelist RBRACE SEMI GOTO INT
-{ {Grammar_types.condition=$1; Grammar_types.action=$4;Grammar_types.clock_resets=Array.of_list($8); Grammar_types.next_location=$12} }
+{ {Grammar_types.condition=$1;
+   Grammar_types.action=$4;
+   Grammar_types.clock_resets=Array.of_list($8);
+   Grammar_types.next_location=$12} }
 ;
 
 transitionlist:

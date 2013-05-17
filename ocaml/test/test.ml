@@ -39,7 +39,7 @@ let test16 =
 let test17 =
   if
     None <>
-    (clock_constraint_to_raw_t_option
+    (clock_constraint_to_dbm_option
        [|"X"; "Y"|]
        [Le("X", 4); Ge ("X", 3)]
     )
@@ -50,7 +50,7 @@ let test17 =
 
 let test18 =
   if
-    None = (clock_constraint_to_raw_t_option
+    None = (clock_constraint_to_dbm_option
        [|"X"; "Y"|]
        [Le("X", 3); Ge ("X", 4)]
     )
@@ -216,5 +216,29 @@ let _ =
   print_string test78;
   print_newline ();
   print_string test79;
+  print_newline ();
+  print_string test80;
+  print_newline ();
+  print_string test81;
+  print_newline ();
+  print_string test82;
+  print_newline ();
+  print_string test83;
+  print_newline ();
+  print_string test84;
+  print_newline ();
+  print_string test85;
+  print_newline ();
+  print_string test86;
+  print_newline ();
+  print_string test87;
+  print_newline ();
+  print_string test88;
+  print_newline ();
+  print_string test89;
+  print_newline ();
+  print_string test90;
+  print_newline ();
+  print_string test91;
   print_newline ();
   exit 0

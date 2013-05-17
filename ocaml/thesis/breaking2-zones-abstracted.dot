@@ -1,0 +1,20 @@
+digraph {
+"0 $X - Y > 1 \\wedge Y = 1$" [style=filled,color=silver];
+"0 $X - Y > 1 \\wedge Y < 1$" [style=filled,color=silver];
+"0 $X - Y > 1 \\wedge Y > 1$" [style=filled,color=silver];
+"0 $(X - 1 = Y) = 1$";
+"0 $0 \\leq (X - 1 = Y) < 1$";
+"0 $(X - 1 = Y) > 1$";
+"0 $(X = Y) > 1$";
+"0 $(X = Y) < 1$";
+"0 $(X = Y) = 1$";
+"0 $X - Y > 1 \\wedge Y < 1$" -> "0 $X - Y > 1 \\wedge Y = 1$" [label = "$\\epsilon$"];
+"0 $X - Y > 1 \\wedge Y = 1$" -> "0 $X - Y > 1 \\wedge Y < 1$" [label = "0"];
+"0 $(X - 1 = Y) = 1$" -> "0 $X - Y > 1 \\wedge Y < 1$" [label = "0"];
+"0 $X - Y > 1 \\wedge Y < 1$" -> "0 $X - Y > 1 \\wedge Y > 1$" [label = "$\\epsilon$"];
+"0 $0 \\leq (X - 1 = Y) < 1$" -> "0 $(X - 1 = Y) = 1$" [label = "$\\epsilon$"];
+"0 $(X = Y) = 1$" -> "0 $0 \\leq (X - 1 = Y) < 1$" [label = "0"];
+"0 $(X - 1 = Y) = 1$" -> "0 $(X - 1 = Y) > 1$" [label = "$\\epsilon$"];
+"0 $(X = Y) = 1$" -> "0 $(X = Y) > 1$" [label = "$\\epsilon$"];
+"0 $(X = Y) < 1$" -> "0 $(X = Y) = 1$" [label = "$\\epsilon$"];
+}

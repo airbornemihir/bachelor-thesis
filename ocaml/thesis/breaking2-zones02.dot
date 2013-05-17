@@ -1,0 +1,13 @@
+digraph {
+"0 $(X = Y) < 1$" [style=filled,color=tomato];
+"0 $(X = Y) = 1$" [style=filled,color=tomato];
+"0 $(X = Y) > 1$" [style=filled,color=tomato];
+"0 $(X - 1 = Y) < 1$" [style=filled,color=lightskyblue];
+"0 $(X - 1 = Y) = 1$" [style=filled,color=lightskyblue];
+"0 $(X - 1 = Y) > 1$" [style=filled,color=lightskyblue];
+"0 $(X = Y) < 1$" -> "0 $(X = Y) = 1$" [label = "$\\epsilon$"]
+"0 $(X = Y) = 1$" -> "0 $(X = Y) > 1$" [label = "$\\epsilon$"]
+"0 $(X = Y) = 1$" -> "0 $(X - 1 = Y) < 1$" [label = "a"]
+"0 $(X - 1 = Y) < 1$" -> "0 $(X - 1 = Y) = 1$" [label = "$\\epsilon$"]
+"0 $(X - 1 = Y) = 1$" -> "0 $(X - 1 = Y) > 1$" [label = "$\\epsilon$"]
+}

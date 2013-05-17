@@ -2,4 +2,4 @@
 <c/zone_stubs.c>: include_udbm
 <zone.cm{x,}a>: use_zone, use_udbm
 <**/*.native>: use_zone
-<fernandez-ocaml-noweb> or <grammar-noweb> or <zone-valuation-graph> or <next_step> or <utilities> or <c> or <test> or <clutter> or <relations>: include
+<fernandez-ocaml-noweb> or <grammar-noweb> or <zone-valuation-graph> or <utilities> or <c> or <test> or <clutter> or <relations>: include

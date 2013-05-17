@@ -233,7 +233,7 @@ let split_zone_on_clock_constraint zone clock_constraint clock_names=
               (List.filter
                  (function zone ->
                    match
-                     (clock_constraint_to_raw_t_option clock_names zone.zone_constraint1)
+                     (clock_constraint_to_dbm_option clock_names zone.zone_constraint1)
                    with
                      None -> false
                    | _ -> true

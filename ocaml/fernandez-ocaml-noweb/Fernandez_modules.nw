@@ -1,9 +1,9 @@
-\section{Fernandez' algorithm in Ocaml}
+\subsection{Fernandez' algorithm in Ocaml}
 
 This section documents the current implementation of Fernandez'
 algorithm in Ocaml.
 
-\subsection{Signature LTS_TYPE}
+\subsubsection{Signature LTS_TYPE}
 This signature defines the interface we expect any LTS data type to provide.
 <<Fernandez_modules.ml>>=
 module type LTS_TYPE =
@@ -53,7 +53,7 @@ end
 
 @ 
 \end{itemize}
-\subsection{Functor LTS}
+\subsubsection{Functor LTS}
 This functor provides the essential algorithms for an LTS while
 abstracting out the exact implementation.
 <<Fernandez_modules.ml>>=
@@ -635,7 +635,7 @@ end
 <<Fernandez_modules.ml>>=
 
 @ 
-\subsection Structure SimpleLT
+\subsubsection Structure SimpleLT
 This structure provides a simple LTS, using an array of in adjacency
 lists to represent the LTS.
 <<Fernandez_modules.ml>>=
@@ -668,7 +668,7 @@ struct
 end
 
 @ 
-\subsection Structure SimpleLTS
+\subsubsection Structure SimpleLTS
 This structure uses the functor LTS and the structure SimpleLT.
 <<Fernandez_modules.ml>>=
 module SimpleLTS = LTS (SimpleLT)
@@ -682,7 +682,7 @@ let lts1 = {SimpleLT.in_adjacencies = [|[(2, [6])];
                                         [(0, [1])]|]; SimpleLT.action_count=3}
 
 @ 
-\subsection Examples
+\subsubsection Examples
 <<Fernandez_modules.ml>>=
 let pi1 = SimpleLTS.fernandez lts1
 let lts2 = {SimpleLT.in_adjacencies=[|[(0, [5])]; 
