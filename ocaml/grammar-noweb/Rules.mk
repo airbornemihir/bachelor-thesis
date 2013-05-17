@@ -9,8 +9,6 @@ $(d)/timed_automaton_parser.mly \
 $(d)/timed_automaton_parser.mly.tex \
 $(d)/grammar_types.ml \
 $(d)/grammar_types.tex
-# $(d)/grammar_types.mli \
-# $(d)/grammar_types.mli.tex \
 $(d)/calc.native
 
 $(TGT_$(d)): d := $(d)
@@ -24,16 +22,17 @@ $(TGT_$(d)): $(d)/Rules.mk
 
 $(d)/calc.ml:$(d)/calc.ml.nw
 	notangle -Rcalc.ml $(d)/calc.ml.nw >$(d)/calc.ml
+
 $(d)/timed_automaton_lexer.mll:$(d)/timed_automaton_lexer.mll.nw
 	notangle -Rtimed_automaton_lexer.mll $(d)/timed_automaton_lexer.mll.nw >$(d)/timed_automaton_lexer.mll
+
 $(d)/timed_automaton_parser.mly:$(d)/timed_automaton_parser.mly.nw
 	notangle -Rtimed_automaton_parser.mly $(d)/timed_automaton_parser.mly.nw >$(d)/timed_automaton_parser.mly
+
 $(d)/grammar_types.ml:$(d)/grammar_types.nw
 	notangle -Rgrammar_types.ml $(d)/grammar_types.nw \
 >$(d)/grammar_types.ml
-# $(d)/grammar_types.mli: $(d)/grammar_types.nw
-# 	notangle -Rgrammar_types.mli $(d)/grammar_types.nw \
-# 	>$(d)/grammar_types.mli
+
 $(d)/calc.native:$(d)/calc.ml \
 $(d)/timed_automaton_lexer.mll $(d)/timed_automaton_parser.mly \
 $(d)/grammar_types.ml $(d)/grammar_types.mli
