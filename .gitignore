@@ -105,3 +105,5 @@ ocaml/zone-valuation-graph/graph_functions.ml
 /ocaml/utilities/parse_timed_automaton.ml.tex
 /ocaml/zone-valuation-graph/calc.ml.tex
 /ocaml/zone-valuation-graph/compare_automata.ml.tex
+/ocaml/grammar-noweb/grammar_types.ml.tex
+/ocaml/thesis/grammar_types.ml.tex

@@ -109,20 +109,3 @@ test.native: $(TEST_DEPS)
 	zone-valuation-graph/calc.native \
 	test/test.native \
 	zone-valuation-graph/compare_automata.native
-
-calc.top: \
-zone-valuation-graph/calc.ml \
-$(grammar_types) \
-grammar-noweb/timed_automaton_lexer.mll \
-grammar-noweb/timed_automaton_parser.mly \
-utilities/parse_timed_automaton.ml \
-fernandez-ocaml-noweb/fernandez.ml \
-fernandez-ocaml-noweb/fernandez.mli \
-Rules.mk \
-_tags \
-myocamlbuild.ml
-	ocamlbuild calc.top
-
-Fernandez_modules.cmo: fernandez-ocaml-noweb/Fernandez_modules.ml
-	ocamlbuild Fernandez_modules.cmo
-

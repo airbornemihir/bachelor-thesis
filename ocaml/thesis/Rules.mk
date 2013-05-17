@@ -19,7 +19,7 @@ $(d)/regiongraph01.pdf_tex \
 $(d)/regiongraph02.pdf_tex
 
 SOURCE_TEX := \
-$(d)/grammar_types.tex \
+$(d)/grammar_types.ml.tex \
 $(d)/timed_automaton_parser.mly.tex \
 $(d)/timed_automaton_lexer.mll.tex \
 $(d)/Clock_constraint_utilities.ml.tex \
@@ -58,7 +58,7 @@ $(d)/%.pdf_tex: $(d)/%.svg
 	inkscape -D -z --file=$< --export-pdf=$(subst pdf_tex,pdf,$@) \
 	--export-latex
 
-$(d)/grammar_types.tex: grammar-noweb/grammar_types.tex
+$(d)/grammar_types.ml.tex: grammar-noweb/grammar_types.ml.tex
 	cp $< $@
 
 $(d)/timed_automaton_parser.mly.tex: grammar-noweb/timed_automaton_parser.mly.tex
