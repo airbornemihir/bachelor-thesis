@@ -4,13 +4,9 @@ These files provide the essential datatypes we work with.
 <<grammar_types.mli>>=
 open Zone_stubs
 
-module Valuation: Map.S with type key=string
-
 <<grammar_types.ml>>=
 open Zone_stubs
 
-module Valuation = Map.Make (String)
-
 <<grammar_types.mli>>=
 type unit_clock_constraint = True
 		       | False
@@ -85,18 +81,6 @@ type timed_automaton = {
   numinit: int;
   clock_names: string array;
   locations: location array
-}
-
-<<grammar_types.mli>>=
-type state = {
-  location: int;
-  valuation: float Valuation.t
-}
-
-<<grammar_types.ml>>=
-type state = {
-  location: int;
-  valuation: float Valuation.t
 }
 
 <<grammar_types.ml>>=
