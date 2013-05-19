@@ -95,6 +95,9 @@ c/zone.mllib \
 c/zone_stubs.c
 	$(OCAMLBUILD) libzone_stubs.a
 
+Alt_Fernandez_modules.cmo: fernandez-ocaml-noweb/Alt_Fernandez_modules.ml
+	$(OCAMLBUILD) Alt_Fernandez_modules.cmo
+
 compare_automata.native: $(COMPARE_AUTOMATA_DEPS)
 
 calc.native: $(CALC_NATIVE_DEPS)

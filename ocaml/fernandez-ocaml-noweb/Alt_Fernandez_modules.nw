@@ -1,0 +1,8 @@
+<<Alt_Fernandez_modules.ml>>=
+(* open Graph *)
+open Graph.Persistent
+
+module type LTS_TYPE = 
+sig
+  (* include Persistent.Digraph.ConcreteBidirectionalLabeled *)
+end

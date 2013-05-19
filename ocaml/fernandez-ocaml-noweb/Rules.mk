@@ -2,7 +2,7 @@ sp := $(sp).x
 dirstack_$(sp) := $(d)
 d := $(dir)
 
-TGT_$(d) := $(d)/Fernandez_modules.ml
+TGT_$(d) := $(d)/Fernandez_modules.ml $(d)/Alt_Fernandez_modules.ml
 
 $(TGT_$(d)): d := $(d)
 #This is a target-specific variable, meant to
@@ -16,6 +16,10 @@ $(TGT_$(d)): $(d)/Rules.mk
 $(d)/Fernandez_modules.ml: $(d)/Fernandez_modules.nw
 	notangle -RFernandez_modules.ml $(d)/Fernandez_modules.nw \
 	>$(d)/Fernandez_modules.ml
+
+$(d)/Alt_Fernandez_modules.ml: $(d)/Alt_Fernandez_modules.nw
+	notangle -RAlt_Fernandez_modules.ml $(d)/Alt_Fernandez_modules.nw \
+	>$(d)/Alt_Fernandez_modules.ml
 
 d := $(dirstack_$(sp))
 sp := $(basename $(sp))
