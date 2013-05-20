@@ -11,6 +11,7 @@ open Test_base_clutter
 open Clock_constraint_clutter_test
 open PCQueue_test
 open Graph_functions2_test
+open Alt_Fernandez_modules_test
   
 let test14 =
   if
