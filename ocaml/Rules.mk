@@ -85,6 +85,7 @@ c/zone_stubs.mli \
 c/Zone_stubs_test.ml \
 utilities/NRQueue.ml \
 utilities/PCQueue_test.ml \
+fernandez-ocaml-noweb/Alt_Fernandez_modules.ml \
 fernandez-ocaml-noweb/Alt_Fernandez_modules_test.ml \
 Rules.mk \
 _tags\

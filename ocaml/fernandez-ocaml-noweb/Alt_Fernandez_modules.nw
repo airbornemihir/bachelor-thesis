@@ -5,21 +5,49 @@ This file provides an alternate implementation of Fernandez' algorithm
 <<Alt_Fernandez_modules.ml>>=
 open Graph
 
+module type LTS_STATE_TYPE =
+sig
+  include Sig.COMPARABLE
+  val state_name: t -> string
+end
+
 module type LTS_ACTION_TYPE = 
 sig
   include Sig.ORDERED_TYPE_DFT
   type action = t
-  module ActionSet : Set.S with type elt=action
-  val actions: ActionSet.t
+  module ActionMap : Map.S with type key=action
+  val action_names: string ActionMap.t
+end
+  
+module type LTS_TYPE =
+sig
+  include Sig.P
+  type action
+  module ActionMap : Map.S with type key=action
+  val action_names: string ActionMap.t
+  val graph_attributes : t -> Graphviz.DotAttributes.graph list
+  val default_vertex_attributes : t -> Graphviz.DotAttributes.vertex list
+  val vertex_name : V.t -> string
+  val vertex_attributes : V.t -> Graphviz.DotAttributes.vertex list
+  val get_subgraph : V.t -> Graphviz.DotAttributes.subgraph option
+  val default_edge_attributes : t -> Graphviz.DotAttributes.edge list
+  val edge_attributes : E.t -> Graphviz.DotAttributes.edge list
 end
 
 module LTS_Functor = 
-  functor (V : Sig.COMPARABLE) -> 
+  functor (V : LTS_STATE_TYPE) -> 
     functor (E : LTS_ACTION_TYPE) ->
       (struct
+
+        let vertex_name = V.state_name
+
+        type action = E.action
+        module ActionMap = E.ActionMap
+        let action_names = E.action_names
+          
         let mod_add_edge add_edge g v1 v2 =
           if
-            E.ActionSet.mem E.default (E.actions)
+            E.ActionMap.mem E.default (E.action_names)
           then
             add_edge g v1 v2
           else
@@ -27,7 +55,7 @@ module LTS_Functor =
           
         let mod_add_edge_e add_edge_e g (v1, e, v2) =
           if
-            E.ActionSet.mem e (E.actions)
+            E.ActionMap.mem e (E.action_names)
           then
             add_edge_e g (v1, e, v2)
           else
@@ -38,8 +66,43 @@ module LTS_Functor =
         include Base
           
         let add_edge_e = mod_add_edge_e add_edge_e
+
         let add_edge = mod_add_edge add_edge
+
+        let graph_attributes g  = []
+
+        let default_vertex_attributes g = []
+
+        let vertex_attributes v = []
+
+        let get_subgraph v = None
+
+        let default_edge_attributes g = []
+
+        let edge_attributes (_, a, _) = [`Label (ActionMap.find a action_names)]
        end
-         : Sig.P  with type V.t = V.t and type V.label = V.t
+         : LTS_TYPE  with type V.t = V.t and type V.label = V.t
                   and type E.t = V.t * E.t * V.t and type E.label = E.t
       )
+
+module LTS_Dot_Functor =
+  functor (LTS: LTS_TYPE) ->
+struct
+  include Graphviz.Dot (LTS)
+end
+
+module Fernandez_Functor =
+  functor (LTS: LTS_TYPE) ->
+struct
+  module StateSet = Set.Make(LTS.V)
+  module InfoMap = Map.Make(
+    struct
+      type t = LTS.V.t * LTS.action
+      let compare = Pervasives.compare
+    end
+  )
+  type block = {
+    node_refs: StateSet.t;
+    info: InfoMap.t
+  }
+end
