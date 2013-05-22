@@ -289,14 +289,14 @@ struct
     F1.Compound
       ({F1.node_refs =
           F1.StateSet.add
-            5
+            4
             (F1.StateSet.add
-               4
+               3
                (F1.StateSet.add
-                  3
+                  2
                   (F1.StateSet.add
-                     2
-                     (F1.StateSet.add 1 F1.StateSet.empty)
+                     1
+                     (F1.StateSet.add 0 F1.StateSet.empty)
                   )
                )
             );
@@ -304,28 +304,28 @@ struct
        },
        F1.Simple
          {F1.node_refs =
-             F1.StateSet.add 2 (F1.StateSet.add 1 F1.StateSet.empty);
+             F1.StateSet.add 1 (F1.StateSet.add 0 F1.StateSet.empty);
           F1.info = F1.InfoMap.empty
          },
        F1.Compound
          ({F1.node_refs =
              F1.StateSet.add
-               5
+               4
                (F1.StateSet.add
-                  4
-                  (F1.StateSet.add 3 F1.StateSet.empty)
+                  3
+                  (F1.StateSet.add 2 F1.StateSet.empty)
                );
            F1.info = F1.InfoMap.empty
           },
           F1.Simple
-            {F1.node_refs = F1.StateSet.add 3 F1.StateSet.empty;
+            {F1.node_refs = F1.StateSet.add 2 F1.StateSet.empty;
              F1.info = F1.InfoMap.empty
             },
           F1.Simple
             {F1.node_refs =
                 F1.StateSet.add
-                  5
-                  (F1.StateSet.add 4 F1.StateSet.empty)
+                  4
+                  (F1.StateSet.add 3 F1.StateSet.empty)
             ;
              F1.info = F1.InfoMap.empty
             }
@@ -336,14 +336,14 @@ struct
     F1.Compound
       ({F1.node_refs =
           F1.StateSet.add
-            5
+            4
             (F1.StateSet.add
-               4
+               3
                (F1.StateSet.add
-                  3
+                  2
                   (F1.StateSet.add
-                     2
-                     (F1.StateSet.add 1 F1.StateSet.empty)
+                     1
+                     (F1.StateSet.add 0 F1.StateSet.empty)
                   )
                )
             );
@@ -351,37 +351,37 @@ struct
        },
        F1.Simple
          {F1.node_refs =
-             F1.StateSet.add 2 (F1.StateSet.add 1 F1.StateSet.empty);
+             F1.StateSet.add 1 (F1.StateSet.add 0 F1.StateSet.empty);
           F1.info = F1.InfoMap.empty
          },
        F1.Compound
          ({F1.node_refs =
              F1.StateSet.add
-               5
+               4
                (F1.StateSet.add
-                  4
-                  (F1.StateSet.add 3 F1.StateSet.empty)
+                  3
+                  (F1.StateSet.add 2 F1.StateSet.empty)
                );
            F1.info = F1.InfoMap.empty
           },
           F1.Simple
-            {F1.node_refs = F1.StateSet.add 3 F1.StateSet.empty;
+            {F1.node_refs = F1.StateSet.add 2 F1.StateSet.empty;
              F1.info = F1.InfoMap.empty
             },
           F1.Compound
             ({F1.node_refs =
                 F1.StateSet.add
-                  5
-                  (F1.StateSet.add 4 F1.StateSet.empty)
+                  4
+                  (F1.StateSet.add 3 F1.StateSet.empty)
             ;
              F1.info = F1.InfoMap.empty
             },
              F1.Simple
-               {F1.node_refs = F1.StateSet.add 5 F1.StateSet.empty;
+               {F1.node_refs = F1.StateSet.add 4 F1.StateSet.empty;
                 F1.info = F1.InfoMap.empty
                },
              F1.Simple
-               {F1.node_refs = F1.StateSet.add 4 F1.StateSet.empty;
+               {F1.node_refs = F1.StateSet.add 3 F1.StateSet.empty;
                 F1.info = F1.InfoMap.empty
                }
             )
@@ -391,10 +391,10 @@ struct
   let block01 =
     {F1.node_refs =
         F1.StateSet.add
-          8
+          7
           (F1.StateSet.add
-             7
-             (F1.StateSet.add 6 F1.StateSet.empty)
+             6
+             (F1.StateSet.add 5 F1.StateSet.empty)
           );
      F1.info = F1.InfoMap.empty
     }
@@ -403,14 +403,14 @@ struct
     {F1.node_refs =
         F1.StateSet.add
           7
-          (F1.StateSet.add 6 F1.StateSet.empty)
+          (F1.StateSet.add 5 F1.StateSet.empty)
     ;
      F1.info = F1.InfoMap.empty
     }
 
   let block03 =
     {F1.node_refs =
-        F1.StateSet.add 8 F1.StateSet.empty
+        F1.StateSet.add 7 F1.StateSet.empty
     ;
      F1.info = F1.InfoMap.empty
     }
@@ -418,22 +418,22 @@ struct
   let block04 =
     {F1.node_refs =
         F1.StateSet.add
-          5
-          (F1.StateSet.add 4 F1.StateSet.empty)
+          4
+          (F1.StateSet.add 3 F1.StateSet.empty)
     ;
      F1.info = F1.InfoMap.empty
     }
 
   let block05 =
     {F1.node_refs =
-        F1.StateSet.add 5 F1.StateSet.empty
+        F1.StateSet.add 4 F1.StateSet.empty
     ;
      F1.info = F1.InfoMap.empty
     }
 
   let block06 =
     {F1.node_refs =
-        F1.StateSet.add 4 F1.StateSet.empty
+        F1.StateSet.add 3 F1.StateSet.empty
     ;
      F1.info = F1.InfoMap.empty
     }
