@@ -256,4 +256,10 @@ let _ =
   print_newline ();
   print_string test99;
   print_newline ();
+  print_string test100;
+  print_newline ();
+  print_string test101;
+  print_newline ();
+  print_string test102;
+  print_newline ();
   exit 0
