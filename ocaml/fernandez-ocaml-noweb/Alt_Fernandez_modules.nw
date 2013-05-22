@@ -22,7 +22,7 @@ end
 module type LTS_TYPE =
 sig
   include Sig.P
-  type action
+  type action = E.label
   module ActionMap : Map.S with type key=action
   val action_names: string ActionMap.t
   val graph_attributes : t -> Graphviz.DotAttributes.graph list
@@ -35,36 +35,36 @@ sig
 end
 
 module LTS_Functor = 
-  functor (V : LTS_STATE_TYPE) -> 
-    functor (E : LTS_ACTION_TYPE) ->
+  functor (S : LTS_STATE_TYPE) -> 
+    functor (A : LTS_ACTION_TYPE) ->
       (struct
 
-        let vertex_name = V.state_name
+        module Base = Persistent.Digraph.ConcreteBidirectionalLabeled
+          (S) (A)
+        include Base
+          
+        let vertex_name = S.state_name
 
-        type action = E.action
-        module ActionMap = E.ActionMap
-        let action_names = E.action_names
+        type action = A.t
+        module ActionMap = A.ActionMap
+        let action_names = A.action_names
           
         let mod_add_edge add_edge g v1 v2 =
           if
-            E.ActionMap.mem E.default (E.action_names)
+            A.ActionMap.mem A.default (A.action_names)
           then
             add_edge g v1 v2
           else
             raise (Invalid_argument "Invalid action.")
           
-        let mod_add_edge_e add_edge_e g (v1, e, v2) =
+        let mod_add_edge_e add_edge_e g e =
           if
-            E.ActionMap.mem e (E.action_names)
+            A.ActionMap.mem (E.label e) (A.action_names)
           then
-            add_edge_e g (v1, e, v2)
+            add_edge_e g e
           else
             raise (Invalid_argument "Invalid action.")
               
-        module Base = Persistent.Digraph.ConcreteBidirectionalLabeled
-          (V) (E)
-        include Base
-          
         let add_edge_e = mod_add_edge_e add_edge_e
 
         let add_edge = mod_add_edge add_edge
@@ -81,8 +81,8 @@ module LTS_Functor =
 
         let edge_attributes (_, a, _) = [`Label (ActionMap.find a action_names)]
        end
-         : LTS_TYPE  with type V.t = V.t and type V.label = V.t
-                  and type E.t = V.t * E.t * V.t and type E.label = E.t
+         : LTS_TYPE  with type V.t = S.t and type V.label = S.t
+                  and type E.t = S.t * A.t * S.t and type E.label = A.t
       )
 
 module LTS_Dot_Functor =
@@ -97,12 +97,363 @@ struct
   module StateSet = Set.Make(LTS.V)
   module InfoMap = Map.Make(
     struct
-      type t = LTS.V.t * LTS.action
+      type t = LTS.action * LTS.V.t
       let compare = Pervasives.compare
     end
   )
   type block = {
     node_refs: StateSet.t;
-    info: InfoMap.t
+    info: int InfoMap.t
   }
+  module BlockSet = Set.Make(
+    struct
+      type t = block
+      let compare = Pervasives.compare
+    end
+  )
+  type partition = BlockSet.t
+  type splitter = Simple of block | Compound of block * splitter * splitter
+
+  let rec two_way_update_tree t x x1 x2 =
+    match t with
+    | Simple t0 ->
+        if
+          t0 = x
+        then
+          (Compound (x, Simple x1, Simple x2), true)
+        else
+          (t, false)
+    | Compound (t0, t1, t2) ->
+      match
+        (two_way_update_tree t1 x x1 x2)
+      with
+      | (_, false) -> (
+          match
+            (two_way_update_tree t2 x x1 x2)
+          with
+          | (_, false) -> (t, false)
+          | (tt2, true) -> (Compound (t0, t1, tt2), true)
+         )
+      | (tt1, true) -> (Compound (t0, tt1, t2), true)
+
+  let rec two_way_update_queue w x x1 x2 =
+    match w with
+      [] -> [Compound (x, Simple x1, Simple x2)]
+    | t::ts -> (match (two_way_update_tree t x x1 x2) with
+      (_, false) -> t::(two_way_update_queue ts x x1 x2)
+      | (tt, true) -> tt::ts
+    )
+
+  let get_info l node_refs =
+    LTS.fold_vertex
+      (function v ->
+        function m ->
+          LTS.ActionMap.fold
+            (function action ->
+              function action_name ->
+                function m ->
+                  InfoMap.add
+                    (action, v)
+                    (LTS.fold_succ_e
+                       (function e ->
+                         function count ->
+                           if
+                             (action = LTS.E.label e
+                                 &&
+                                   (StateSet.mem
+                                      (LTS.E.dst e)
+                                      node_refs
+                                   )
+                             )
+                           then
+                             count + 1
+                           else
+                             count
+                       )
+                       l
+                       v
+                       0
+                    )
+                    m
+            )
+            LTS.action_names
+            m
+      )
+      l
+      InfoMap.empty
+
+  let get_block_from_node_refs l node_refs =
+    {node_refs = node_refs;
+     info =
+        (get_info l node_refs)
+    }
+
+end
+
+module Test =
+struct
+  module V =
+  struct
+    type t = int
+    let compare = Pervasives.compare
+    let hash = Hashtbl.hash
+    let equal = Pervasives.(=)
+    let state_name = string_of_int
+  end
+
+  module E1 =
+  struct
+    type t = int
+    let compare = Pervasives.compare
+    let default = 0
+    type action = t
+    module ActionMap = Map.Make(
+      struct
+        type t = action
+        let compare = Pervasives.compare
+      end
+    )
+    let action_names =
+      ActionMap.add 2 "2" (ActionMap.add 1 "1" (ActionMap.add 0 "0" ActionMap.empty))
+  end
+
+  module IntIntLTS1 = LTS_Functor (V) (E1)
+
+  let test93 =
+    try
+      match
+        IntIntLTS1.add_edge IntIntLTS1.empty 0 1
+      with
+      | _ -> "test93 passed"
+    with
+    | Invalid_argument _ -> "test93 failed"
+
+  let test94 =
+    try
+      match
+        IntIntLTS1.add_edge_e IntIntLTS1.empty (0, 0, 1)
+      with
+      | _ -> "test94 passed"
+    with
+    | Invalid_argument _ -> "test94 failed"
+
+  let test95 =
+    try
+      match
+        IntIntLTS1.add_edge_e IntIntLTS1.empty (0, -1, 1)
+      with
+      | _ -> "test95 failed"
+    with
+    | Invalid_argument _ -> "test95 passed"
+
+  module E2 =
+  struct
+    include E1
+    let action_names = ActionMap.add 3 "3" (ActionMap.add 2 "2" (ActionMap.add 1 "1" ActionMap.empty))
+  end
+
+  module IntIntLTS2 = LTS_Functor (V) (E2)
+
+  module IntIntLTS1Dot = LTS_Dot_Functor (IntIntLTS1)
+
+  module IntIntLTS2Dot = LTS_Dot_Functor (IntIntLTS2)
+
+  let test96 =
+    try
+      match
+        IntIntLTS2.add_edge IntIntLTS2.empty 0 1
+      with
+      | g -> "test96 failed"
+    with
+    | Invalid_argument _ -> "test96 passed"
+
+  let test97 =
+    try
+      match
+        IntIntLTS2.add_edge_e IntIntLTS2.empty (0, 3, 1)
+      with
+      | g -> "test97 passed"
+    with
+    | Invalid_argument _ -> "test97 failed"
+
+  let g01 =
+    List.fold_left
+      (fun g e -> IntIntLTS1.add_edge_e g e)
+      (IntIntLTS1.add_vertex IntIntLTS1.empty 7)
+      [(0, 0, 1); (1, 0, 1); (2, 1, 3); (3, 1, 4); (4, 1, 2); (5, 0, 0);
+       (6, 0, 3); (5, 1, 6)]
+
+  module F1 = Fernandez_Functor (IntIntLTS1)
+
+  let splitter01 =
+    F1.Compound
+      ({F1.node_refs =
+          F1.StateSet.add
+            5
+            (F1.StateSet.add
+               4
+               (F1.StateSet.add
+                  3
+                  (F1.StateSet.add
+                     2
+                     (F1.StateSet.add 1 F1.StateSet.empty)
+                  )
+               )
+            );
+        F1.info = F1.InfoMap.empty
+       },
+       F1.Simple
+         {F1.node_refs =
+             F1.StateSet.add 2 (F1.StateSet.add 1 F1.StateSet.empty);
+          F1.info = F1.InfoMap.empty
+         },
+       F1.Compound
+         ({F1.node_refs =
+             F1.StateSet.add
+               5
+               (F1.StateSet.add
+                  4
+                  (F1.StateSet.add 3 F1.StateSet.empty)
+               );
+           F1.info = F1.InfoMap.empty
+          },
+          F1.Simple
+            {F1.node_refs = F1.StateSet.add 3 F1.StateSet.empty;
+             F1.info = F1.InfoMap.empty
+            },
+          F1.Simple
+            {F1.node_refs =
+                F1.StateSet.add
+                  5
+                  (F1.StateSet.add 4 F1.StateSet.empty)
+            ;
+             F1.info = F1.InfoMap.empty
+            }
+         )
+      )
+
+  let splitter02 =
+    F1.Compound
+      ({F1.node_refs =
+          F1.StateSet.add
+            5
+            (F1.StateSet.add
+               4
+               (F1.StateSet.add
+                  3
+                  (F1.StateSet.add
+                     2
+                     (F1.StateSet.add 1 F1.StateSet.empty)
+                  )
+               )
+            );
+        F1.info = F1.InfoMap.empty
+       },
+       F1.Simple
+         {F1.node_refs =
+             F1.StateSet.add 2 (F1.StateSet.add 1 F1.StateSet.empty);
+          F1.info = F1.InfoMap.empty
+         },
+       F1.Compound
+         ({F1.node_refs =
+             F1.StateSet.add
+               5
+               (F1.StateSet.add
+                  4
+                  (F1.StateSet.add 3 F1.StateSet.empty)
+               );
+           F1.info = F1.InfoMap.empty
+          },
+          F1.Simple
+            {F1.node_refs = F1.StateSet.add 3 F1.StateSet.empty;
+             F1.info = F1.InfoMap.empty
+            },
+          F1.Compound
+            ({F1.node_refs =
+                F1.StateSet.add
+                  5
+                  (F1.StateSet.add 4 F1.StateSet.empty)
+            ;
+             F1.info = F1.InfoMap.empty
+            },
+             F1.Simple
+               {F1.node_refs = F1.StateSet.add 5 F1.StateSet.empty;
+                F1.info = F1.InfoMap.empty
+               },
+             F1.Simple
+               {F1.node_refs = F1.StateSet.add 4 F1.StateSet.empty;
+                F1.info = F1.InfoMap.empty
+               }
+            )
+         )
+      )
+
+  let block01 =
+    {F1.node_refs =
+        F1.StateSet.add
+          8
+          (F1.StateSet.add
+             7
+             (F1.StateSet.add 6 F1.StateSet.empty)
+          );
+     F1.info = F1.InfoMap.empty
+    }
+
+  let block02 =
+    {F1.node_refs =
+        F1.StateSet.add
+          7
+          (F1.StateSet.add 6 F1.StateSet.empty)
+    ;
+     F1.info = F1.InfoMap.empty
+    }
+
+  let block03 =
+    {F1.node_refs =
+        F1.StateSet.add 8 F1.StateSet.empty
+    ;
+     F1.info = F1.InfoMap.empty
+    }
+
+  let block04 =
+    {F1.node_refs =
+        F1.StateSet.add
+          5
+          (F1.StateSet.add 4 F1.StateSet.empty)
+    ;
+     F1.info = F1.InfoMap.empty
+    }
+
+  let block05 =
+    {F1.node_refs =
+        F1.StateSet.add 5 F1.StateSet.empty
+    ;
+     F1.info = F1.InfoMap.empty
+    }
+
+  let block06 =
+    {F1.node_refs =
+        F1.StateSet.add 4 F1.StateSet.empty
+    ;
+     F1.info = F1.InfoMap.empty
+    }
+
+  let test98 =
+    if
+      F1.two_way_update_tree splitter01 block01 block02 block03 =
+      (splitter01, false)
+    then
+      "test98 passed"
+    else
+      "test98 failed"
+
+  let test99 =
+    if
+      F1.two_way_update_tree splitter01 block04 block05 block06 =
+      (splitter02, true)
+    then
+      "test99 passed"
+    else
+      "test99 failed"
+
 end

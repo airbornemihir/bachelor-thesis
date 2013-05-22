@@ -11,7 +11,7 @@ open Test_base_clutter
 open Clock_constraint_clutter_test
 open PCQueue_test
 open Graph_functions2_test
-open Alt_Fernandez_modules_test
+open Alt_Fernandez_modules.Test
   
 let test14 =
   if
@@ -251,5 +251,9 @@ let _ =
   print_string test96;
   print_newline ();
   print_string test97;
+  print_newline ();
+  print_string test98;
+  print_newline ();
+  print_string test99;
   print_newline ();
   exit 0
