@@ -158,7 +158,24 @@ struct
                        (function e ->
                          function count ->
                            if
-                             (action = LTS.E.label e
+                             (*The following expression is meant to
+                               compare the two actions using their
+                               own semantics, instead of
+                               Pervasives.(=), because the latter is
+                               inaccurate and because lame data
+                               hiding only allows this way of using
+                               the actions' own semantics for comparison.*)
+                             (LTS.ActionMap.cardinal
+                                (LTS.ActionMap.add
+                                   action
+                                   ()
+                                   (LTS.ActionMap.add
+                                      (LTS.E.label e)
+                                      ()
+                                      LTS.ActionMap.empty
+                                   )
+                                )
+                              = 1
                                  &&
                                    (StateSet.mem
                                       (LTS.E.dst e)
@@ -188,32 +205,46 @@ struct
         (get_info l node_refs)
     }
 
-  (* let simple_split_block_on_action l x b a = *)
-  (*   match *)
-  (*     StateSet.fold *)
-  (*       (function v -> *)
-  (*         function (x1indices, x2indices) -> *)
-  (*           if *)
-  (*             StateSet.exists *)
-  (*           then *)
-  (*             () *)
-  (*           else *)
-  (*             () *)
-  (*       ) *)
-  (*       x.node_refs *)
-  (*       (StateSet.empty, StateSet.empty) *)
-  (*     List.partition *)
-  (*       (function xelem -> *)
-  (*         List.exists *)
-  (*           (function belem -> *)
-  (*             (List.exists (node_equality l xelem) (in_adjacency l belem a)) *)
-  (*           ) *)
-  (*           b.node_refs) *)
-  (*       x.node_refs *)
-  (*   with *)
-  (*     (x1indices, x2indices) -> *)
-  (*       (get_block_from_node_refs l x1indices, get_block_from_node_refs l x2indices) *)
-
+  let simple_split_block_on_action l x b action =
+    match
+      StateSet.fold
+        (function xelem ->
+          function (x1indices, x2indices) ->
+            if
+              LTS.fold_succ_e
+                (function e ->
+                  Pervasives.(||)
+                    (
+                      (StateSet.mem
+                         (LTS.E.dst e)
+                         b.node_refs
+                      ) &&
+                        LTS.ActionMap.cardinal
+                        (LTS.ActionMap.add
+                           action
+                           ()
+                           (LTS.ActionMap.add
+                              (LTS.E.label e)
+                              ()
+                              LTS.ActionMap.empty
+                           )
+                        )
+                      = 1
+                    )
+                )
+                l
+                xelem
+                false
+            then
+              (StateSet.add xelem x1indices, x2indices)
+            else
+              (x1indices, StateSet.add xelem x2indices)
+        )
+        x.node_refs
+        (StateSet.empty, StateSet.empty)
+    with
+      (x1indices, x2indices) ->
+        (get_block_from_node_refs l x1indices, get_block_from_node_refs l x2indices)
 end
 
 module Test =
@@ -519,5 +550,45 @@ struct
       "test102 passed"
     else
       "test102 failed"
+
+  let block09 =
+    F1.get_block_from_node_refs
+      l02 (F1.StateSet.add 2 (F1.StateSet.add 1 (F1.StateSet.add 0 F1.StateSet.empty)))
+
+  let test103 =
+    if
+      match
+        F1.simple_split_block_on_action l02 block09 block09 0
+      with
+      | (x1, x2) ->
+        (F1.StateSet.equal
+           x1.F1.node_refs
+           (F1.StateSet.add 2 (F1.StateSet.add 1 F1.StateSet.empty))
+        ) && (F1.StateSet.equal
+                x2.F1.node_refs
+                (F1.StateSet.add 0 F1.StateSet.empty)
+         )
+    then
+      "test103 passed"
+    else
+      "test103 failed"
+
+  let test104 =
+    if
+      match
+        F1.simple_split_block_on_action l02 block09 block09 1
+      with
+      | (x1, x2) ->
+        (F1.StateSet.equal
+           x1.F1.node_refs
+           (F1.StateSet.add 2 (F1.StateSet.add 1 F1.StateSet.empty))
+        ) && (F1.StateSet.equal
+                x2.F1.node_refs
+                (F1.StateSet.add 0 F1.StateSet.empty)
+         )
+    then
+      "test104 passed"
+    else
+      "test104 failed"
 
 end
