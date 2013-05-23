@@ -207,41 +207,34 @@ struct
 
   let simple_split_block_on_action l x b action =
     match
-      StateSet.fold
+      StateSet.partition
         (function xelem ->
-          function (x1indices, x2indices) ->
-            if
-              LTS.fold_succ_e
-                (function e ->
-                  Pervasives.(||)
-                    (
-                      (StateSet.mem
-                         (LTS.E.dst e)
-                         b.node_refs
-                      ) &&
-                        LTS.ActionMap.cardinal
-                        (LTS.ActionMap.add
-                           action
-                           ()
-                           (LTS.ActionMap.add
-                              (LTS.E.label e)
-                              ()
-                              LTS.ActionMap.empty
-                           )
-                        )
-                      = 1
+          LTS.fold_succ_e
+            (function e ->
+              Pervasives.(||)
+                (
+                  (StateSet.mem
+                     (LTS.E.dst e)
+                     b.node_refs
+                  ) &&
+                    LTS.ActionMap.cardinal
+                    (LTS.ActionMap.add
+                       action
+                       ()
+                       (LTS.ActionMap.add
+                          (LTS.E.label e)
+                          ()
+                          LTS.ActionMap.empty
+                       )
                     )
+                  = 1
                 )
-                l
-                xelem
-                false
-            then
-              (StateSet.add xelem x1indices, x2indices)
-            else
-              (x1indices, StateSet.add xelem x2indices)
+            )
+            l
+            xelem
+            false
         )
         x.node_refs
-        (StateSet.empty, StateSet.empty)
     with
       (x1indices, x2indices) ->
         (get_block_from_node_refs l x1indices, get_block_from_node_refs l x2indices)
