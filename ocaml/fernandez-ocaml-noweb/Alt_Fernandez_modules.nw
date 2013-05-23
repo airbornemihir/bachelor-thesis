@@ -238,6 +238,43 @@ struct
     with
       (x1indices, x2indices) ->
         (get_block_from_node_refs l x1indices, get_block_from_node_refs l x2indices)
+
+  let compound_split_block_on_action l x b b1 b2 a =
+    let 
+        (b1, b2) =
+      if
+        ((StateSet.cardinal b2.node_refs) < (StateSet.cardinal b1.node_refs))
+      then
+        (b2, b1)
+      else
+        (b1, b2)
+    in
+    match
+      (StateSet.partition
+         (function xelem -> (InfoMap.find (a, xelem) b1.info) > 0)
+         x.node_refs)
+    with
+      (y1, y2) ->
+        (match
+            (StateSet.partition
+               (function xelem ->
+                 (InfoMap.find (a, xelem) b1.info) < (InfoMap.find (a, xelem) b.info)
+               )
+               y1
+               ,
+             StateSet.partition
+               (function xelem ->
+                 (InfoMap.find (a, xelem) b.info) > 0
+               )
+               y2)
+         with
+           ((x3noderefs, x1noderefs), (x2noderefs, x4noderefs)) ->
+             ((get_block_from_node_refs l x3noderefs,
+               get_block_from_node_refs l x1noderefs),
+              (get_block_from_node_refs l x2noderefs,
+               get_block_from_node_refs l x4noderefs))
+        )
+
 end
 
 module Test =
@@ -574,14 +611,32 @@ struct
       | (x1, x2) ->
         (F1.StateSet.equal
            x1.F1.node_refs
-           (F1.StateSet.add 2 (F1.StateSet.add 1 F1.StateSet.empty))
+           (F1.StateSet.add 0 F1.StateSet.empty)
         ) && (F1.StateSet.equal
                 x2.F1.node_refs
-                (F1.StateSet.add 0 F1.StateSet.empty)
+                (F1.StateSet.add 2 (F1.StateSet.add 1 F1.StateSet.empty))
          )
     then
       "test104 passed"
     else
       "test104 failed"
+
+  let test105 =
+    if
+      match
+        F1.simple_split_block_on_action l02 block09 block09 2
+      with
+      | (x1, x2) ->
+        (F1.StateSet.equal
+           x1.F1.node_refs
+           F1.StateSet.empty
+        ) && (F1.StateSet.equal
+                x2.F1.node_refs
+                (F1.StateSet.add 2 (F1.StateSet.add 1 (F1.StateSet.add 0 F1.StateSet.empty)))
+         )
+    then
+      "test105 passed"
+    else
+      "test105 failed"
 
 end

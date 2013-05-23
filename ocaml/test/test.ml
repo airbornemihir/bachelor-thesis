@@ -262,4 +262,10 @@ let _ =
   print_newline ();
   print_string test102;
   print_newline ();
+  print_string test103;
+  print_newline ();
+  print_string test104;
+  print_newline ();
+  print_string test105;
+  print_newline ();
   exit 0
