@@ -236,3 +236,279 @@ let test92 =
     "test92 passed"
   else
     "test92 failed"
+
+let dbm19 = 
+  dbm_constrain_using_tuple (dbm_init 2) (1, 0, true, 4)
+
+let test108 () =
+  let
+      result = dbm_max_delay dbm19 [|Slack 0; Slack 0|]
+  in
+  if
+    result = ([|Slack 0|], Lstrict 4)
+  then
+    "test108 passed"
+  else
+    ("test108 failed, the output is " ^
+        (match
+            result
+         with
+         | (_, Lstrict n) -> "Lstrict " ^ (string_of_int n)
+         | (_, Slack n) -> "Slack " ^ (string_of_int n)
+         | (_, Rstrict n) -> "Rstrict " ^ (string_of_int n)
+         | (_, Inf) -> "Inf") ^
+        "\n")
+
+let dbm20 = 
+  dbm_constrain_using_tuple (dbm_init 2) (1, 0, false, 4)
+
+let test109 () =
+  let
+      result = dbm_max_delay dbm20 [|Slack 0; Slack 0|]
+  in
+  if
+    result = ([|Slack 0|], Slack 4)
+  then
+    "test109 passed"
+  else
+    ("test109 failed, the output is " ^
+        (match
+            result
+         with
+         | (_, Lstrict n) -> "Lstrict " ^ (string_of_int n)
+         | (_, Slack n) -> "Slack " ^ (string_of_int n)
+         | (_, Rstrict n) -> "Rstrict " ^ (string_of_int n)
+         | (_, Inf) -> "Inf") ^
+        "\n")
+
+let dbm21 = 
+  dbm_constrain_using_tuple (dbm_init 2) (0, 1, false, -4)
+
+let test110 () =
+  let
+      result = dbm_max_delay dbm21 [|Slack 0; Slack 4|]
+  in
+  if
+    result = ([|Slack 0|], Inf)
+  then
+    "test110 passed"
+  else
+    ("test110 failed, the output is " ^
+        (match
+            result
+         with
+         | (_, Lstrict n) -> "Lstrict " ^ (string_of_int n)
+         | (_, Slack n) -> "Slack " ^ (string_of_int n)
+         | (_, Rstrict n) -> "Rstrict " ^ (string_of_int n)
+         | (_, Inf) -> "Inf") ^
+        "\n")
+
+let dbm22 = 
+  dbm_constrain_using_tuple (dbm_init 2) (0, 1, true, -4)
+
+let test111 () =
+  let
+      result = dbm_max_delay dbm22 [|Slack 0; Rstrict 4|]
+  in
+  if
+    result = ([|Slack 0|], Inf)
+  then
+    "test111 passed"
+  else
+    ("test111 failed, the output is " ^
+        (match
+            result
+         with
+         | (_, Lstrict n) -> "Lstrict " ^ (string_of_int n)
+         | (_, Slack n) -> "Slack " ^ (string_of_int n)
+         | (_, Rstrict n) -> "Rstrict " ^ (string_of_int n)
+         | (_, Inf) -> "Inf") ^
+        "\n")
+
+let dbm23 = 
+  dbm_constrain_using_tuple (dbm_init 2) (1, 0, false, 4)
+
+let test112 () =
+  let
+      result = dbm_max_delay dbm23 [|Slack 0; Rstrict 0|]
+  in
+  if
+    result = ([|Slack 0|], Lstrict 4)
+  then
+    "test112 passed"
+  else
+    ("test112 failed, the output is " ^
+        (match
+            result
+         with
+         | (_, Lstrict n) -> "Lstrict " ^ (string_of_int n)
+         | (_, Slack n) -> "Slack " ^ (string_of_int n)
+         | (_, Rstrict n) -> "Rstrict " ^ (string_of_int n)
+         | (_, Inf) -> "Inf") ^
+        "\n")
+
+let dbm24 = 
+  dbm_constrain_using_tuple (dbm_init 2) (1, 0, true, 4)
+
+let test113 () =
+  let
+      result = dbm_max_delay dbm24 [|Slack 0; Rstrict 0|]
+  in
+  if
+    result = ([|Slack 0|], Lstrict 4)
+  then
+    "test113 passed"
+  else
+    ("test113 failed, the output is " ^
+        (match
+            result
+         with
+         | (_, Lstrict n) -> "Lstrict " ^ (string_of_int n)
+         | (_, Slack n) -> "Slack " ^ (string_of_int n)
+         | (_, Rstrict n) -> "Rstrict " ^ (string_of_int n)
+         | (_, Inf) -> "Inf") ^
+        "\n")
+
+let dbm25 = 
+  dbm_constrain_using_tuple
+    (dbm_constrain_using_tuple (dbm_init 3) (1, 0, true, 4))
+    (2, 0, true, 4)
+
+let test114 () =
+  let
+      result = dbm_max_delay dbm25 [|Slack 0; Slack 0; Slack 0|]
+  in
+  if
+    result = ([|Slack 0|], Lstrict 4)
+  then
+    "test114 passed"
+  else
+    ("test114 failed, the output is " ^
+        (match
+            result
+         with
+         | (_, Lstrict n) -> "Lstrict " ^ (string_of_int n)
+         | (_, Slack n) -> "Slack " ^ (string_of_int n)
+         | (_, Rstrict n) -> "Rstrict " ^ (string_of_int n)
+         | (_, Inf) -> "Inf") ^
+        "\n")
+
+let dbm26 = 
+  dbm_constrain_using_tuple
+    (dbm_constrain_using_tuple (dbm_init 3) (1, 0, false, 4))
+    (2, 0, false, 4)
+
+let test115 () =
+  let
+      result = dbm_max_delay dbm26 [|Slack 0; Slack 0; Slack 0|]
+  in
+  if
+    result = ([|Slack 0|], Slack 4)
+  then
+    "test115 passed"
+  else
+    ("test115 failed, the output is " ^
+        (match
+            result
+         with
+         | (_, Lstrict n) -> "Lstrict " ^ (string_of_int n)
+         | (_, Slack n) -> "Slack " ^ (string_of_int n)
+         | (_, Rstrict n) -> "Rstrict " ^ (string_of_int n)
+         | (_, Inf) -> "Inf") ^
+        "\n")
+
+let dbm27 = 
+  dbm_constrain_using_tuple
+    (dbm_constrain_using_tuple (dbm_init 3) (1, 0, true, 4))
+    (2, 0, false, 4)
+
+let test116 () =
+  let
+      result = dbm_max_delay dbm27 [|Slack 0; Slack 0; Slack 0|]
+  in
+  if
+    result = ([|Slack 0|], Lstrict 4)
+  then
+    "test116 passed"
+  else
+    ("test116 failed, the output is " ^
+        (match
+            result
+         with
+         | (_, Lstrict n) -> "Lstrict " ^ (string_of_int n)
+         | (_, Slack n) -> "Slack " ^ (string_of_int n)
+         | (_, Rstrict n) -> "Rstrict " ^ (string_of_int n)
+         | (_, Inf) -> "Inf") ^
+        "\n")
+
+let dbm28 = 
+  dbm_constrain_using_tuple
+    (dbm_constrain_using_tuple (dbm_init 3) (1, 0, false, 4))
+    (2, 0, true, 4)
+
+let test117 () =
+  let
+      result = dbm_max_delay dbm28 [|Slack 0; Slack 0; Slack 0|]
+  in
+  if
+    result = ([|Slack 0|], Lstrict 4)
+  then
+    "test117 passed"
+  else
+    ("test117 failed, the output is " ^
+        (match
+            result
+         with
+         | (_, Lstrict n) -> "Lstrict " ^ (string_of_int n)
+         | (_, Slack n) -> "Slack " ^ (string_of_int n)
+         | (_, Rstrict n) -> "Rstrict " ^ (string_of_int n)
+         | (_, Inf) -> "Inf") ^
+        "\n")
+
+let dbm29 = 
+  dbm_constrain_using_tuple
+    (dbm_constrain_using_tuple (dbm_init 3) (1, 0, true, 4))
+    (2, 0, false, 4)
+
+let test118 () =
+  let
+      result = dbm_max_delay dbm29 [|Slack 0; Rstrict 0; Rstrict 0|]
+  in
+  if
+    result = ([|Slack 0|], Lstrict 4)
+  then
+    "test118 passed"
+  else
+    ("test118 failed, the output is " ^
+        (match
+            result
+         with
+         | (_, Lstrict n) -> "Lstrict " ^ (string_of_int n)
+         | (_, Slack n) -> "Slack " ^ (string_of_int n)
+         | (_, Rstrict n) -> "Rstrict " ^ (string_of_int n)
+         | (_, Inf) -> "Inf") ^
+        "\n")
+
+let dbm30 = 
+  dbm_constrain_using_tuple
+    (dbm_constrain_using_tuple (dbm_init 3) (1, 0, false, 4))
+    (2, 0, true, 4)
+
+let test119 () =
+  let
+      result = dbm_max_delay dbm30 [|Slack 0; Rstrict 0; Rstrict 0|]
+  in
+  if
+    result = ([|Slack 0|], Lstrict 4)
+  then
+    "test119 passed"
+  else
+    ("test119 failed, the output is " ^
+        (match
+            result
+         with
+         | (_, Lstrict n) -> "Lstrict " ^ (string_of_int n)
+         | (_, Slack n) -> "Slack " ^ (string_of_int n)
+         | (_, Rstrict n) -> "Rstrict " ^ (string_of_int n)
+         | (_, Inf) -> "Inf") ^
+        "\n")

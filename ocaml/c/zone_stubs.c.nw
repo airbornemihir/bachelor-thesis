@@ -515,32 +515,106 @@ strictness, bound)} constraint list (not minimal, used for abstraction.).
     current = Val_int(0); 
 
     /* str += "("; */
-    for(cindex_t i = 0; i < dim; ++i)
-      {
-        for(cindex_t j = 0; j < dim; ++j)
-          {
-            if (!(dbm[i*dim+j] == dbm_LS_INFINITY) && i != j)
-              {
-                CAMLlocal1(hd);
-                hd = caml_alloc_tuple(4);
-                Store_field(hd, 0, Val_int(i));
-                Store_field(hd, 1, Val_int(j));
-                switch (dbm_rawIsStrict(dbm[i*dim+j])) {
-                case TRUE: Store_field(hd, 2, Val_int(1));break;
-                case FALSE: Store_field(hd, 2, Val_int(0));break;
-                default: break;
-                }
-                Store_field(hd, 3, Val_int(dbm_raw2bound(dbm[i*dim + j])));
-                CAMLlocal1(temp);
-                temp = caml_alloc(2, 0);
-                Store_field(temp, 0, hd);
-                Store_field(temp, 1, current);
-                current = temp;
-              }
+    for(cindex_t i = 0; i < dim; ++i) {
+      for(cindex_t j = 0; j < dim; ++j) {
+        if (!(dbm[i*dim+j] == dbm_LS_INFINITY) && i != j) {
+          CAMLlocal1(hd);
+          hd = caml_alloc_tuple(4);
+          Store_field(hd, 0, Val_int(i));
+          Store_field(hd, 1, Val_int(j));
+          switch (dbm_rawIsStrict(dbm[i*dim+j])) {
+          case TRUE: Store_field(hd, 2, Val_int(1));break;
+          case FALSE: Store_field(hd, 2, Val_int(0));break;
+          default: break;
           }
+          Store_field(hd, 3, Val_int(dbm_raw2bound(dbm[i*dim + j])));
+          CAMLlocal1(temp);
+          temp = caml_alloc(2, 0);
+          Store_field(temp, 0, hd);
+          Store_field(temp, 1, current);
+          current = temp;
+        }
       }
+    }
   stop_loops:
     CAMLreturn(current);
+  }
+
+  CAMLprim value zone_dbm_max_delay (value dbm_value, value valuation) {
+    CAMLparam2(dbm_value, valuation);
+
+    //initialise to infinity.
+    int delay_is_infinity = (0 == 0);
+    int delay;
+    int delay_is_strict = (0 == 0);
+
+    raw_t *dbm = dbm_struct_t_val(dbm_value).dbm;
+    cindex_t dim = dbm_struct_t_val(dbm_value).dim;
+    assert (!dbm_isEmpty(dbm, dim));
+
+    //i = 0 is excluded because it's gotta be zero always.
+    for (cindex_t i = 1; i < dim; ++i) {
+      int condition = (dbm[i*dim+0] != dbm_LS_INFINITY);
+      if (condition) {
+        condition = delay_is_infinity;
+        if (!condition) {
+          //For the valuation[i] thingy, Lstrict is not possible,
+          //neither is Inf.
+          condition = (Int_val(Field(Field(valuation, i), 0)) + delay >
+                       dbm_raw2bound(dbm[i*dim+0])) ||
+            ((Int_val(Field(Field(valuation, i), 0)) + delay ==
+              dbm_raw2bound(dbm[i*dim+0])) && (!delay_is_strict) &&
+             dbm_rawIsStrict(dbm[i*dim+0]));
+        }
+      }
+      if (condition) {
+          //Lstrict is not possible, neither is Inf.
+        assert(Tag_val(Field(valuation, i)) == 1 || Tag_val(Field(valuation, i)) == 2);
+        delay_is_infinity = false;
+        delay = dbm_raw2bound(dbm[i*dim+0]) -
+          Int_val(Field(Field(valuation, i), 0));
+        //if this constraint is strict, then we can't wait for a
+        //slack time interval. however, if it is slack, then we can.
+        delay_is_strict =
+          (Tag_val(Field(valuation, i)) == 2) ||
+          dbm_rawIsStrict(dbm[i*dim+0]);
+        /* printf("i = %d, delay = %d, delay_is_strict = %s\n", i, */
+        /*        delay, delay_is_strict ? "true" : "false"); */
+      }
+    }
+    /* fflush(stdout); */
+    CAMLlocal1(valuation_val);
+    valuation_val = caml_alloc(
+                               1,  //1 for now.
+                               0     //tag is 0 for arrays.
+                               );
+    CAMLlocal1(zero_val);
+    zero_val = caml_alloc(
+                          1, //need only space for 1 int
+                          1  //tag is 1 for Slack.
+                          );
+    Store_field(zero_val, 0, Val_int(0));
+    Store_field(
+                valuation_val, //the block
+                0, //0th field
+                zero_val
+                );
+    CAMLlocal1(delay_val);
+    if (delay_is_infinity) {
+      delay_val = Val_int(0); //this is the first constant constructor,
+      //that is, Inf .
+    } else {
+      delay_val = caml_alloc(1, delay_is_strict ? (0) : (1)); // first
+      // non-constant constructor is Lstrict, second is Slack. Rstrict
+      // is not possible.
+      Store_field(delay_val, 0, Val_int(delay)); // both these constructors have
+      // only one argument, which is at position 0.
+    }
+    CAMLlocal1(return_val);
+    return_val = caml_alloc_tuple(2);
+    Store_field(return_val, 1, delay_val);
+    Store_field(return_val, 0, valuation_val);
+    CAMLreturn(return_val);
   }
 
 #ifdef __cplusplus

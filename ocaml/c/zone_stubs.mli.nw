@@ -2,6 +2,10 @@
 This file provides the Ocaml side of the interface between Ocaml and C.
 
 <<zone_stubs.mli>>=
+type time_delay = Lstrict of int | Slack of int | Rstrict of int | Inf
+
+type valuation = time_delay array
+
 type dbm_struct_t (*This usually dbm_struct_t values, which
                     themselves contain malloc()-ated pointers.*)
 type constraint_t
@@ -47,3 +51,6 @@ external dbm_toConstraintList:
 external dbm_toLargerConstraintList:
   dbm_struct_t -> ((int * int * bool * int) list) =
   "zone_dbm_toLargerConstraintList"
+external dbm_max_delay:
+  dbm_struct_t -> valuation -> valuation * time_delay  =
+  "zone_dbm_max_delay"
