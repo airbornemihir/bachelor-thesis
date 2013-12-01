@@ -586,9 +586,26 @@ strictness, bound)} constraint list (not minimal, used for abstraction.).
     CAMLlocal1(valuation_val);
     valuation_val = caml_alloc(
                                1,  //1 for now.
-                               0     //tag is 0 for arrays.
+                               dim     //tag is 0 for arrays.
                                );
     CAMLlocal1(zero_val);
+    for (cindex_t i = 1; i < dim; ++i) {
+      CAMLlocal1(clock_valuation_val);
+      if (delay_is_infinity) {
+        clock_valuation_val = Val_int(0); /* this is the first
+                                             constant constructor, Inf. */
+      } else {
+        clock_valuation_val = caml_alloc(
+                                         1, // need space for 1 integer.
+                                         (!delay_is_strict ||
+                                          Tag_val(Field(valuation, i)) == 2) ? (2) : (1)
+                                         );
+        Store_field(clock_valuation_val,
+                    0,
+                    Val_int(delay + Field(Field(valuation, i), 0))); // both these constructors have
+        // only one argument, which is at position 0.
+      }
+    }
     zero_val = caml_alloc(
                           1, //need only space for 1 int
                           1  //tag is 1 for Slack.
