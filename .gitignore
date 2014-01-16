@@ -109,7 +109,6 @@ ocaml/zone-valuation-graph/graph_functions.ml
 /ocaml/thesis/grammar_types.ml.tex
 /ocaml/grammar-noweb/grammar_types.ml.tex
 /ocaml/thesis/grammar_types.ml.tex
-/ocaml/fernandez-ocaml-noweb/Alt_Fernandez_modules.ml
 /ocaml/grammar-noweb/Alt_grammar_types.ml
 /ocaml/grammar-noweb/Alt_timed_automaton_parser.mly
 /ocaml/grammar-noweb/Alt_timed_automaton_lexer.mll
