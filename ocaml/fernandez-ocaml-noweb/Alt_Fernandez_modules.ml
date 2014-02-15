@@ -406,27 +406,27 @@ module NK_Rel =
 	  (* now we can remove all entries in which the n-value is not
              greater than n and the k-value is not greater than k. *)
 	  let yes_table = addEntry yes_table p q n k in
-	  (* for each successor p' of p, check if that is simulated by a successor q' of q *)
+	    (* for each successor p' of p, check if that is simulated by a successor q' of q *)
+          let
+              () =
+            Printf.printf
+              "p = %s, (LTS.nb_vertex lts1) = %s\n"
+              (LTS.vertex_name p)
+              (string_of_int (LTS.nb_vertex lts1))
+          in
 	  let
 	      (v_p, l_p) =
-            let
-                () =
-              Printf.printf
-                "p = %s, (LTS.nb_vertex lts1) = %s\n"
-                (LTS.vertex_name p)
-                (string_of_int (LTS.nb_vertex lts1))
-            in
             (LTS.fold_succ_e
 	       (fun e_p (partial_v_p, partial_l_p) ->
                  let
+                     () =
+                   Printf.printf
+                     "q = %s, (LTS.nb_vertex lts2) = %s\n"
+                     (LTS.vertex_name q)
+                     (string_of_int (LTS.nb_vertex lts2))
+                 in
+                 let
                      (match_found, v_q, l_q) =
-                   let
-                       () =
-                     Printf.printf
-                       "q = %s, (LTS.nb_vertex lts2) = %s\n"
-                       (LTS.vertex_name q)
-                       (string_of_int (LTS.nb_vertex lts2))
-                   in
                    (LTS.fold_succ_e
 		      (fun e_q (partial_match_found, partial_v_q, partial_l_q) ->
                         if (LTS.A.compare (LTS.E.label e_p) (LTS.E.label e_q) <> 0)
@@ -488,26 +488,31 @@ module NK_Rel =
                l_p
             )
 	  in
+          let
+              () =
+            Printf.printf
+              "q = %s, (LTS.nb_vertex lts2) = %s\n"
+              (LTS.vertex_name q)
+              (string_of_int (LTS.nb_vertex lts2))
+          in
 	  let
 	      (v_q, l_q) =
-            let
-                () =
-              Printf.printf
-                "q = %s, (LTS.nb_vertex lts2) = %s\n"
-                (LTS.vertex_name q)
-                (string_of_int (LTS.nb_vertex lts2))
-            in
+            if
+              (n - 1 < 0)
+            then
+              (true, [])
+            else
 	    (LTS.fold_succ_e
 	       (fun e_q (partial_v_q, partial_l_q) ->
                  let
+                     () =
+                   Printf.printf
+                     "p = %s, (LTS.nb_vertex lts1) = %s\n"
+                     (LTS.vertex_name p)
+                     (string_of_int (LTS.nb_vertex lts1))
+                 in
+                 let
                      (match_found, v_p, l_p) =
-                   let
-                       () =
-                     Printf.printf
-                       "p = %s, (LTS.nb_vertex lts1) = %s\n"
-                       (LTS.vertex_name p)
-                       (string_of_int (LTS.nb_vertex lts1))
-                   in
 	           (LTS.fold_succ_e
 		      (fun e_p (partial_match_found, partial_v_p, partial_l_p) ->
                         if (LTS.A.compare (LTS.E.label e_q) (LTS.E.label e_p) <> 0)
@@ -1050,13 +1055,13 @@ module Test =
 	l04
 	0
 	14
-	0
+	3
 	4
 	()
 
-        (* Shibashis: I assume that true means the defender has won
-        and the relation holds when the challenger starts with l03 in
-        the first round *)
+    (* Shibashis: I assume that true means the defender has won
+       and the relation holds when the challenger starts with l03 in
+       the first round *)
         
     let test120_p2 =  (* Shibashis: Challenger chooses now l04 in the first round *)
       IntIntLTS3NK_Rel.checknkRel
@@ -1064,7 +1069,7 @@ module Test =
 	l03
 	14
 	0
-	0
+	3
 	4
 	()
 
