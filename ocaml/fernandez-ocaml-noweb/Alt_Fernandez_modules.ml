@@ -54,7 +54,7 @@ module LTS_Functor =
             add_edge g v1 v2
           else
             raise (Invalid_argument "Invalid action.")
-          
+              
         let mod_add_edge_e add_edge_e g e =
           if
             A.ActionMap.mem (E.label e) (A.action_names)
@@ -131,28 +131,28 @@ struct
       StateSet.equal b1.node_refs b2.node_refs
     | (Compound (b1, s11, s12), Compound (b2, s21, s22)) ->
       (StateSet.equal b1.node_refs b2.node_refs) &&
-      (verify_splitter s11 s12) && (verify_splitter s21 s22)
+        (verify_splitter s11 s12) && (verify_splitter s21 s22)
 
   let rec two_way_update_tree t x x1 x2 =
     match t with
     | Simple t0 ->
-        if
-          StateSet.equal t0.node_refs x.node_refs
-        then
-          (Compound (x, Simple x1, Simple x2), true)
-        else
-          (t, false)
+      if
+        StateSet.equal t0.node_refs x.node_refs
+      then
+        (Compound (x, Simple x1, Simple x2), true)
+      else
+        (t, false)
     | Compound (t0, t1, t2) ->
       match
         (two_way_update_tree t1 x x1 x2)
       with
       | (_, false) -> (
-          match
-            (two_way_update_tree t2 x x1 x2)
-          with
-          | (_, false) -> (t, false)
-          | (tt2, true) -> (Compound (t0, t1, tt2), true)
-         )
+        match
+          (two_way_update_tree t2 x x1 x2)
+        with
+        | (_, false) -> (t, false)
+        | (tt2, true) -> (Compound (t0, t1, tt2), true)
+      )
       | (tt1, true) -> (Compound (t0, tt1, t2), true)
 
   let rec two_way_update_queue w x x1 x2 =
@@ -195,11 +195,11 @@ struct
                                    )
                                 )
                               = 1
-                                 &&
-                                   (StateSet.mem
-                                      (LTS.E.dst e)
-                                      node_refs
-                                   )
+                                &&
+                                  (StateSet.mem
+                                     (LTS.E.dst e)
+                                     node_refs
+                                  )
                              )
                            then
                              count + 1
@@ -299,6 +299,7 @@ end
 module NK_yes_table_functor =
   functor (LTS: LTS_TYPE) ->
     (struct
+
       module StatePairMap = Map.Make(
         struct
           type t = LTS.V.t * LTS.V.t
@@ -314,8 +315,8 @@ module NK_yes_table_functor =
               temp1
         end
       )
+        
       include StatePairMap
-      (* val add : key -> 'a -> 'a t -> 'a t *)
 
       let conditional_add
           ((p, q):LTS.V.t * LTS.V.t)
@@ -356,17 +357,25 @@ module NK_Rel =
   functor (LTS: LTS_TYPE) ->
     (struct
 
-      let checkEntry _ _ _ = true
+      let checkEntryYesTable yes_table n k =
+        List.exists
+          (function (n1, k1) -> (n1 < n) && (k1 < k))
+          yes_table
 
-      let getEntries _ _ _ = []
+      let checkEntryNoTable no_table n k = 
+        List.exists
+          (function (n1, k1) -> (n1 > n) && (k1 > k))
+          no_table
 
-      let addEntry yes_table p q n k = yes_table
+      let addEntry yes_table p q n k =
+        (n, k)::
+          (List.filter
+             (function (n1, k1) -> (n1 <= n) || (k1 <= k))
+             yes_table)
 
-      let removeEntry yes_table p q n k = true
+      let createYesTable () = []
 
-      let createYesTable () = ()
-
-      let createNoTable () = ()
+      let createNoTable () = []
 
       (* we assume that p is the challenger's position in lts1 and q is
          the defender's position in lts2. thus, if the challenger switches to
@@ -390,22 +399,41 @@ module NK_Rel =
             no_table = createNoTable ()
         in
         if k = 0 then ((true, []), [])
-        else if checkEntry (getEntries yes_table p q) n k  (* The function checkEntry checks if there is at least one entry for p, q with both remaining number of alternations and remaining number of rounds to be greater than n and k respectively. If not then p, q with current n, k values are added in the function getEntry and *)
+        else if checkEntryYesTable yes_table n k  (* The function
+         checkEntryYesTable checks if there is at least one entry for p, q
+         with both remaining number of alternations and remaining
+         number of rounds to be greater than n and k respectively. If
+         not then p, q with current n, k values are added in the
+         function getEntry and *)
         then ((true, []), [])
-        else if checkEntry (getEntries no_table p q) n k
+        else if checkEntryNoTable no_table n k (* This has a somewhat
+         different semantics from checkEntryYesTable . *)
         then ((false, []), [])
         else (
-	  let yes_table = addEntry yes_table p q n k in
 	  (* now we can remove all entries in which the n-value is not
              greater than n and the k-value is not greater than k. *)
-	  let yes_table = removeEntry yes_table p q n k in
+	  let yes_table = addEntry yes_table p q n k in
 	  (* for each successor p' of p, check if that is simulated by a successor q' of q *)
 	  let
 	      (v_p, l_p) =
-	    (LTS.fold_succ_e
+            let
+                () =
+              Printf.printf
+                "p = %s, (LTS.nb_vertex lts1) = %s\n"
+                (LTS.vertex_name p)
+                (string_of_int (LTS.nb_vertex lts1))
+            in
+            (LTS.fold_succ_e
 	       (fun e_p (partial_v_p, partial_l_p) ->
                  let
                      (match_found, v_q, l_q) =
+                   let
+                       () =
+                     Printf.printf
+                       "q = %s, (LTS.nb_vertex lts2) = %s\n"
+                       (LTS.vertex_name q)
+                       (string_of_int (LTS.nb_vertex lts2))
+                   in
                    (LTS.fold_succ_e
 		      (fun e_q (partial_match_found, partial_v_q, partial_l_q) ->
                         if (LTS.A.compare (LTS.E.label e_p) (LTS.E.label e_q) <> 0)
@@ -470,11 +498,25 @@ module NK_Rel =
 	  in
 	  let
 	      (v_q, l_q) =
+            let
+                () =
+              Printf.printf
+                "q = %s, (LTS.nb_vertex lts2) = %s\n"
+                (LTS.vertex_name q)
+                (string_of_int (LTS.nb_vertex lts2))
+            in
 	    (LTS.fold_succ_e
 	       (fun e_q (partial_v_q, partial_l_q) ->
                  let
                      (match_found, v_p, l_p) =
-                   (LTS.fold_succ_e
+                   let
+                       () =
+                     Printf.printf
+                       "p = %s, (LTS.nb_vertex lts1) = %s\n"
+                       (LTS.vertex_name p)
+                       (string_of_int (LTS.nb_vertex lts1))
+                   in
+	           (LTS.fold_succ_e
 		      (fun e_p (partial_match_found, partial_v_p, partial_l_p) ->
                         if (LTS.A.compare (LTS.E.label e_q) (LTS.E.label e_p) <> 0)
                         then
@@ -482,11 +524,16 @@ module NK_Rel =
                         else
                           let
                               ((v_pp, l_pp), _) = (checknkRel
-		                                     lts1
 		                                     lts2
+		                                     lts1
 		                                     (LTS.E.dst e_q)
 		                                     (LTS.E.dst e_p)
-		                                     (n)
+		                                     (if
+                                                         moved_at_least_once
+                                                      then
+                                                         (n - 1)
+                                                      else
+                                                         n)
 		                                     (k - 1)
 		                                     true
 		                                     rel
@@ -502,7 +549,7 @@ module NK_Rel =
                                                 is possible.*)
                           )
 		      )
-		      lts2
+		      lts1
 		      p
 		      (false, false, [])
 	           )
@@ -524,7 +571,7 @@ module NK_Rel =
                                          is possible.*)
                    )
 	       )
-	       lts1
+	       lts2
 	       q
 	       (true, [])
 	    )
@@ -557,20 +604,20 @@ module Test =
     end
 
     module E1 =
-    struct
-      type t = int
-      let compare = Pervasives.compare
-      let default = 0
-      type action = t
-      module ActionMap = Map.Make(
-        struct
-          type t = action
-          let compare = Pervasives.compare
-        end
-      )
-      let action_names =
-        ActionMap.add 2 "2" (ActionMap.add 1 "1" (ActionMap.add 0 "0" ActionMap.empty))
-    end
+      (struct
+        type t = int
+        let compare = Pervasives.compare
+        let default = 0
+        type action = t
+        module ActionMap = Map.Make(
+          struct
+            type t = action
+            let compare = Pervasives.compare
+          end
+        )
+        let action_names =
+          ActionMap.add 2 "2" (ActionMap.add 1 "1" (ActionMap.add 0 "0" ActionMap.empty))
+       end)
 
     module IntIntLTS1 = LTS_Functor (V) (E1)
 
@@ -608,10 +655,10 @@ module Test =
       | Invalid_argument _ -> "test95 passed"
 
     module E2 =
-    struct
-      include E1
-      let action_names = ActionMap.add 3 "3" (ActionMap.add 2 "2" (ActionMap.add 1 "1" ActionMap.empty))
-    end
+      (struct
+        include E1
+        let action_names = ActionMap.add 3 "3" (ActionMap.add 2 "2" (ActionMap.add 1 "1" ActionMap.empty))
+       end)
 
     module IntIntLTS2 = LTS_Functor (V) (E2)
 
@@ -655,12 +702,12 @@ module Test =
               )
               (F1.StateSet.empty)
               [0; 1; 2; 3; 4]
-       (* [4; 3; 2; 1; 0] *) (*This sequence, unsurprisingly,
-                               leads to a test failure. Our
-                               tests are terrible, given that
-                               they use Pervasives.compare for
-                               deep data structures that contain 
-                               sets.*)
+         (* [4; 3; 2; 1; 0] *) (*This sequence, unsurprisingly,
+                                 leads to a test failure. Our
+                                 tests are terrible, given that
+                                 they use Pervasives.compare for
+                                 deep data structures that contain 
+                                 sets.*)
          ;
           F1.info = F1.InfoMap.empty
          },
@@ -899,61 +946,127 @@ module Test =
           else
             "test103 failed"
 
-      let test104 =
-        if
-          match
-            F1.simple_split_block_on_action l02 block09 block09 1
-          with
-          | (x1, x2) ->
-            (F1.StateSet.equal
-               x1.F1.node_refs
-               (F1.StateSet.add 0 F1.StateSet.empty)
-            ) && (F1.StateSet.equal
-                    x2.F1.node_refs
-                    (F1.StateSet.add 2 (F1.StateSet.add 1 F1.StateSet.empty))
-             )
-            then
-              "test104 passed"
-            else
-              "test104 failed"
+    let test104 =
+      if
+        match
+          F1.simple_split_block_on_action l02 block09 block09 1
+        with
+        | (x1, x2) ->
+          (F1.StateSet.equal
+             x1.F1.node_refs
+             (F1.StateSet.add 0 F1.StateSet.empty)
+          ) && (F1.StateSet.equal
+                  x2.F1.node_refs
+                  (F1.StateSet.add 2 (F1.StateSet.add 1 F1.StateSet.empty))
+           )
+          then
+            "test104 passed"
+          else
+            "test104 failed"
 
-        let test105 =
-          if
-            match
-              F1.simple_split_block_on_action l02 block09 block09 2
-            with
-            | (x1, x2) ->
-              (F1.StateSet.equal
-                 x1.F1.node_refs
-                 F1.StateSet.empty
-              ) && (F1.StateSet.equal
-                      x2.F1.node_refs
-                      (F1.StateSet.add 2 (F1.StateSet.add 1 (F1.StateSet.add 0 F1.StateSet.empty)))
-               )
-              then
-                "test105 passed"
-              else
-                "test105 failed"
+    let test105 =
+      if
+        match
+          F1.simple_split_block_on_action l02 block09 block09 2
+        with
+        | (x1, x2) ->
+          (F1.StateSet.equal
+             x1.F1.node_refs
+             F1.StateSet.empty
+          ) && (F1.StateSet.equal
+                  x2.F1.node_refs
+                  (F1.StateSet.add 2 (F1.StateSet.add 1 (F1.StateSet.add 0 F1.StateSet.empty)))
+           )
+          then
+            "test105 passed"
+          else
+            "test105 failed"
 
-          let block10 = F1.get_block_from_node_refs l01
-            (List.fold_left
-               (fun s elem -> F1.StateSet.add elem s)
-               F1.StateSet.empty
-               [0; 1; 2; 3; 4; 5; 6; 7]
-            )
+    let block10 = F1.get_block_from_node_refs l01
+      (List.fold_left
+         (fun s elem -> F1.StateSet.add elem s)
+         F1.StateSet.empty
+         [0; 1; 2; 3; 4; 5; 6; 7]
+      )
 
-          let block11 = F1.get_block_from_node_refs l01
-            (List.fold_left
-               (fun s elem -> F1.StateSet.add elem s)
-               F1.StateSet.empty
-               [0; 1]
-            )
+    let block11 = F1.get_block_from_node_refs l01
+      (List.fold_left
+         (fun s elem -> F1.StateSet.add elem s)
+         F1.StateSet.empty
+         [0; 1]
+      )
 
-          let block12 = F1.get_block_from_node_refs l01
-            (List.fold_left
-               (fun s elem -> F1.StateSet.add elem s)
-               F1.StateSet.empty
-               [2; 3; 4; 5; 6; 7]
-            )
+    let block12 = F1.get_block_from_node_refs l01
+      (List.fold_left
+         (fun s elem -> F1.StateSet.add elem s)
+         F1.StateSet.empty
+         [2; 3; 4; 5; 6; 7]
+      )
 
-          end)
+    module E3 =
+      (struct
+        include E1
+        let action_names =
+          ActionMap.add 3 "3"
+            (ActionMap.add 2 "2"
+               (ActionMap.add 1 "1"
+                  (ActionMap.add 0 "0"
+                     ActionMap.empty)))
+       end)
+
+    module IntIntLTS3 = LTS_Functor (V) (E3)
+
+    let l03 =
+      List.fold_left
+        (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
+        IntIntLTS3.empty
+        [(0, 0, 1);
+         (0, 0, 2);
+         (1, 1, 3);
+         (2, 1, 4);
+         (2, 1, 5);
+         (3, 2, 6);
+         (3, 2, 7);
+         (4, 2, 8);
+         (5, 2, 9);
+         (5, 2, 10);
+         (6, 3, 11);
+         (8, 3, 12);
+         (9, 3, 13)]
+
+    let l04 =
+      List.fold_left
+        (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
+        IntIntLTS3.empty
+        [(14, 0, 15);
+         (15, 1, 16);
+         (15, 1, 17);
+         (16, 2, 18);
+         (17, 2, 19);
+         (17, 2, 20);
+         (18, 3, 21);
+         (19, 3, 22)]
+
+    let () =
+      IntIntLTS3.iter_vertex
+        (function v ->
+          Printf.printf
+            "v = %s\n"
+            (string_of_int v)
+        )
+        l04
+
+    module IntIntLTS3NK_Rel = NK_Rel (IntIntLTS3)
+
+    let test120 =
+      IntIntLTS3NK_Rel.checknkRel
+	l03
+	l04
+	0
+	14
+	0
+	4
+	false
+	()
+
+      end)
