@@ -389,7 +389,6 @@ module NK_Rel =
 	  q
 	  n
 	  k
-	  moved_at_least_once
 	  rel = (* rel is some specific relation, can be a prebisim or
                    a simulation equivalence or a bisimulation *)
         let
@@ -399,15 +398,9 @@ module NK_Rel =
             no_table = createNoTable ()
         in
         if k = 0 then ((true, []), [])
-        else if checkEntryYesTable yes_table n k  (* The function
-         checkEntryYesTable checks if there is at least one entry for p, q
-         with both remaining number of alternations and remaining
-         number of rounds to be greater than n and k respectively. If
-         not then p, q with current n, k values are added in the
-         function getEntry and *)
+        else if checkEntryYesTable yes_table n k  (* The function checkEntry checks if there is at least one entry for p, q with both remaining number of alternations and remaining number of rounds to be greater than n and k respectively. If not then p, q with current n, k values are added in the function getEntry and *)
         then ((true, []), [])
-        else if checkEntryNoTable no_table n k (* This has a somewhat
-         different semantics from checkEntryYesTable . *)
+        else if checkEntryNoTable no_table n k
         then ((false, []), [])
         else (
 	  (* now we can remove all entries in which the n-value is not
@@ -448,7 +441,6 @@ module NK_Rel =
 		                                     (LTS.E.dst e_q)
 		                                     (n)
 		                                     (k - 1)
-		                                     true
 		                                     rel
                           )
                           in
@@ -528,14 +520,8 @@ module NK_Rel =
 		                                     lts1
 		                                     (LTS.E.dst e_q)
 		                                     (LTS.E.dst e_p)
-		                                     (if
-                                                         moved_at_least_once
-                                                      then
-                                                         (n - 1)
-                                                      else
-                                                         n)
+                                                     (n - 1)
 		                                     (k - 1)
-		                                     true
 		                                     rel
                           )
                           in
@@ -1058,7 +1044,7 @@ module Test =
 
     module IntIntLTS3NK_Rel = NK_Rel (IntIntLTS3)
 
-    let test120 =
+    let test120_p1 =
       IntIntLTS3NK_Rel.checknkRel
 	l03
 	l04
@@ -1066,7 +1052,20 @@ module Test =
 	14
 	0
 	4
-	false
+	()
+
+        (* Shibashis: I assume that true means the defender has won
+        and the relation holds when the challenger starts with l03 in
+        the first round *)
+        
+    let test120_p2 =  (* Shibashis: Challenger chooses now l04 in the first round *)
+      IntIntLTS3NK_Rel.checknkRel
+	l04
+	l03
+	14
+	0
+	0
+	4
 	()
 
       end)
