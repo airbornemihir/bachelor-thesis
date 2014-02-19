@@ -397,11 +397,11 @@ module NK_Rel =
         let
             no_table = createNoTable ()
         in
-        if k = 0 then ((true, []), [])
+        if k = 0 then (true, [], [])
         else if checkEntryYesTable yes_table n k  (* The function checkEntry checks if there is at least one entry for p, q with both remaining number of alternations and remaining number of rounds to be greater than n and k respectively. If not then p, q with current n, k values are added in the function getEntry and *)
-        then ((true, []), [])
+        then (true, [], [])
         else if checkEntryNoTable no_table n k
-        then ((false, []), [])
+        then (false, [], [])
         else (
 	  (* now we can remove all entries in which the n-value is not
              greater than n and the k-value is not greater than k. *)
@@ -434,7 +434,7 @@ module NK_Rel =
                           (partial_match_found, partial_v_q, partial_l_q)
                         else
                           let
-                              ((v_qq, l_qq), _) = (checknkRel
+                              (v_qq, l_qq, _) = (checknkRel
 		                                     lts1
 		                                     lts2
 		                                     (LTS.E.dst e_p)
@@ -520,7 +520,7 @@ module NK_Rel =
                           (partial_match_found, partial_v_p, partial_l_p)
                         else
                           let
-                              ((v_pp, l_pp), _) = (checknkRel
+                              (v_pp, l_pp, _) = (checknkRel
 		                                     lts2
 		                                     lts1
 		                                     (LTS.E.dst e_q)
@@ -574,7 +574,7 @@ module NK_Rel =
                l_q
             )
 	  in
-	  ((v_p && v_q, l_p @ l_q), [(* this matters only if the boolean value
+	  (v_p && v_q, l_p @ l_q, [(* this matters only if the boolean value
                                         before this is false. in that case, we need
                                         to return a list of pairs of the form (n,
                                         k) which denotes the various pairs of
@@ -620,12 +620,6 @@ module Test =
         | _ -> "test93 passed"
       with
       | Invalid_argument _ -> "test93 failed"
-
-    module type temp3 = LTS_TYPE  with type V.t = V.t and type V.label = V.t
-                                         
-    type temp1 = IntIntLTS1.A.action
-      
-    let temp2:temp1 = 9
 
     let test94 =
       try
@@ -1050,27 +1044,135 @@ module Test =
     module IntIntLTS3NK_Rel = NK_Rel (IntIntLTS3)
 
     let test120_p1 =
-      IntIntLTS3NK_Rel.checknkRel
-	l03
-	l04
-	0
-	14
-	3
-	4
-	()
+      match
+        IntIntLTS3NK_Rel.checknkRel
+	  l03
+	  l04
+	  0
+	  14
+	  3
+	  4
+	  ()
+      with
+      | (false, _, _) -> "test120_p1 passed"
+      | (true, _, _) -> "test120_p1 failed"
 
     (* Shibashis: I assume that true means the defender has won
        and the relation holds when the challenger starts with l03 in
        the first round *)
         
-    let test120_p2 =  (* Shibashis: Challenger chooses now l04 in the first round *)
-      IntIntLTS3NK_Rel.checknkRel
-	l04
-	l03
-	14
-	0
-	3
-	4
-	()
+    let test120_p2 =  (* Shibashis: Challenger chooses now l04 in the
+    first round *)
+      match
+        IntIntLTS3NK_Rel.checknkRel
+	  l04
+	  l03
+	  14
+	  0
+	  3
+	  4
+	  ()
+      with
+      | (true, _, _) -> "test120_p2 passed"
+      | (false, _, _) -> "test120_p2 failed"
+
+    let test121_p1 =
+      match
+        IntIntLTS3NK_Rel.checknkRel
+	  l03
+	  l04
+	  0
+	  14
+	  2
+	  4
+	  ()
+      with
+      | (true, _, _) -> "test121_p1 passed"
+      | (false, _, _) -> "test121_p1 failed"
+
+    (* Shibashis: I assume that true means the defender has won
+       and the relation holds when the challenger starts with l03 in
+       the first round *)
+        
+    let test121_p2 =  (* Shibashis: Challenger chooses now l04 in the
+    first round *)
+      match
+        IntIntLTS3NK_Rel.checknkRel
+	  l04
+	  l03
+	  14
+	  0
+	  2
+	  4
+	  ()
+      with
+      | (true, _, _) -> "test121_p2 passed"
+      | (false, _, _) -> "test121_p2 failed"
+
+    let test122_p1 =
+      match
+        IntIntLTS3NK_Rel.checknkRel
+	  l03
+	  l04
+	  0
+	  14
+	  3
+	  6
+	  ()
+      with
+      | (false, _, _) -> "test122_p1 passed"
+      | (true, _, _) -> "test122_p1 failed"
+
+    (* Shibashis: I assume that true means the defender has won
+       and the relation holds when the challenger starts with l03 in
+       the first round *)
+        
+    let test122_p2 =  (* Shibashis: Challenger chooses now l04 in the
+    first round *)
+      match
+        IntIntLTS3NK_Rel.checknkRel
+	  l04
+	  l03
+	  14
+	  0
+	  3
+	  6
+	  ()
+      with
+      | (true, _, _) -> "test122_p2 passed"
+      | (false, _, _) -> "test122_p2 failed"
+
+    let test123_p1 =
+      match
+        IntIntLTS3NK_Rel.checknkRel
+	  l03
+	  l04
+	  0
+	  14
+	  2
+	  6
+	  ()
+      with
+      | (true, _, _) -> "test123_p1 passed"
+      | (false, _, _) -> "test123_p1 failed"
+
+    (* Shibashis: I assume that true means the defender has won
+       and the relation holds when the challenger starts with l03 in
+       the first round *)
+        
+    let test123_p2 =  (* Shibashis: Challenger chooses now l04 in the
+    first round *)
+      match
+        IntIntLTS3NK_Rel.checknkRel
+	  l04
+	  l03
+	  14
+	  0
+	  2
+	  6
+	  ()
+      with
+      | (true, _, _) -> "test123_p2 passed"
+      | (false, _, _) -> "test123_p2 failed"
 
       end)
