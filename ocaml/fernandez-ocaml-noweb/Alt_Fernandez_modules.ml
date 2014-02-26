@@ -357,20 +357,23 @@ module NK_Rel =
   functor (LTS: LTS_TYPE) ->
     (struct
 
-      let check_entry_yes_table yes_table n k =
+      let check_entry_yes_table yes_table p q n k =
         List.exists
-          (function (n1, k1) -> (n1 < n) && (k1 < k))
+          (function (p1, q1, n1, k1) ->
+            (p1 = p) && (q1 = q) && (n1 >= n) && (k1 >= k))
           yes_table
 
-      let check_entry_no_table no_table n k = 
+      let check_entry_no_table no_table p q n k = 
         List.exists
-          (function (n1, k1) -> (n1 > n) && (k1 > k))
+          (function (p1, q1, n1, k1) ->
+            (p1 = p) && (q1 = q) && (n1 <= n) && (k1 <= k))
           no_table
 
       let add_entry_yes_table yes_table p q n k =
-        (n, k)::
+        (p, q, n, k)::
           (List.filter
-             (function (n1, k1) -> (n1 <= n) || (k1 <= k))
+             (function (p1, q1, n1, k1) ->
+               (p1 <> p) || (q1 <> q) || (n1 > n) || (k1 > k))
              yes_table)
 
       let create_yes_table () = []
@@ -400,9 +403,9 @@ module NK_Rel =
         (*     no_table = create_no_table () *)
         (* in *)
         if k = 0 then (true, [], [], yes_table, no_table)
-        else if check_entry_yes_table yes_table n k  (* The function checkEntry checks if there is at least one entry for p, q with both remaining number of alternations and remaining number of rounds to be greater than n and k respectively. If not then p, q with current n, k values are added in the function getEntry and *)
+        else if check_entry_yes_table yes_table p q n k  (* The function checkEntry checks if there is at least one entry for p, q with both remaining number of alternations and remaining number of rounds to be greater than n and k respectively. If not then p, q with current n, k values are added in the function getEntry and *)
         then (true, [], [], yes_table, no_table)
-        else if check_entry_no_table no_table n k
+        else if check_entry_no_table no_table p q n k
         then (false, [], [], yes_table, no_table)
         else (
 	  (* now we can remove all entries in which the n-value is not
