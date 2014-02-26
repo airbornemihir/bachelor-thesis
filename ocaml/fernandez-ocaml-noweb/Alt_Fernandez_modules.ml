@@ -357,25 +357,25 @@ module NK_Rel =
   functor (LTS: LTS_TYPE) ->
     (struct
 
-      let checkEntryYesTable yes_table n k =
+      let check_entry_yes_table yes_table n k =
         List.exists
           (function (n1, k1) -> (n1 < n) && (k1 < k))
           yes_table
 
-      let checkEntryNoTable no_table n k = 
+      let check_entry_no_table no_table n k = 
         List.exists
           (function (n1, k1) -> (n1 > n) && (k1 > k))
           no_table
 
-      let addEntry yes_table p q n k =
+      let add_entry_yes_table yes_table p q n k =
         (n, k)::
           (List.filter
              (function (n1, k1) -> (n1 <= n) || (k1 <= k))
              yes_table)
 
-      let createYesTable () = []
+      let create_yes_table () = []
 
-      let createNoTable () = []
+      let create_no_table () = []
 
       (* we assume that p is the challenger's position in lts1 and q is
          the defender's position in lts2. thus, if the challenger switches to
@@ -394,20 +394,20 @@ module NK_Rel =
 	  rel = (* rel is some specific relation, can be a prebisim or
                    a simulation equivalence or a bisimulation *)
         (* let *)
-        (*     yes_table = createYesTable () *)
+        (*     yes_table = create_yes_table () *)
         (* in *)
         (* let *)
-        (*     no_table = createNoTable () *)
+        (*     no_table = create_no_table () *)
         (* in *)
         if k = 0 then (true, [], [], yes_table, no_table)
-        else if checkEntryYesTable yes_table n k  (* The function checkEntry checks if there is at least one entry for p, q with both remaining number of alternations and remaining number of rounds to be greater than n and k respectively. If not then p, q with current n, k values are added in the function getEntry and *)
+        else if check_entry_yes_table yes_table n k  (* The function checkEntry checks if there is at least one entry for p, q with both remaining number of alternations and remaining number of rounds to be greater than n and k respectively. If not then p, q with current n, k values are added in the function getEntry and *)
         then (true, [], [], yes_table, no_table)
-        else if checkEntryNoTable no_table n k
+        else if check_entry_no_table no_table n k
         then (false, [], [], yes_table, no_table)
         else (
 	  (* now we can remove all entries in which the n-value is not
              greater than n and the k-value is not greater than k. *)
-	  let yes_table = addEntry yes_table p q n k in
+	  let yes_table = add_entry_yes_table yes_table p q n k in
 	    (* for each successor p' of p, check if that is simulated by a successor q' of q *)
           let
               () =
@@ -1097,8 +1097,8 @@ module Test =
 	  14
 	  3
 	  4
-          (IntIntLTS3NK_Rel.createYesTable ())
-          (IntIntLTS3NK_Rel.createNoTable ())
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
       | (false, _, _, _, _) -> "test120_p1 passed"
@@ -1118,8 +1118,8 @@ module Test =
 	  0
 	  3
 	  4
-          (IntIntLTS3NK_Rel.createYesTable ())
-          (IntIntLTS3NK_Rel.createNoTable ())
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
       | (true, _, _, _, _) -> "test120_p2 passed"
@@ -1134,8 +1134,8 @@ module Test =
 	  14
 	  2
 	  4
-          (IntIntLTS3NK_Rel.createYesTable ())
-          (IntIntLTS3NK_Rel.createNoTable ())
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
       | (true, _, _, _, _) -> "test121_p1 passed"
@@ -1155,8 +1155,8 @@ module Test =
 	  0
 	  2
 	  4
-          (IntIntLTS3NK_Rel.createYesTable ())
-          (IntIntLTS3NK_Rel.createNoTable ())
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
       | (true, _, _, _, _) -> "test121_p2 passed"
@@ -1171,8 +1171,8 @@ module Test =
 	  14
 	  3
 	  6
-          (IntIntLTS3NK_Rel.createYesTable ())
-          (IntIntLTS3NK_Rel.createNoTable ())
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
       | (false, _, _, _, _) -> "test122_p1 passed"
@@ -1192,8 +1192,8 @@ module Test =
 	  0
 	  3
 	  6
-          (IntIntLTS3NK_Rel.createYesTable ())
-          (IntIntLTS3NK_Rel.createNoTable ())
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
       | (true, _, _, _, _) -> "test122_p2 passed"
@@ -1208,8 +1208,8 @@ module Test =
 	  14
 	  2
 	  6
-          (IntIntLTS3NK_Rel.createYesTable ())
-          (IntIntLTS3NK_Rel.createNoTable ())
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
       | (true, _, _, _, _) -> "test123_p1 passed"
@@ -1229,8 +1229,8 @@ module Test =
 	  0
 	  2
 	  6
-          (IntIntLTS3NK_Rel.createYesTable ())
-          (IntIntLTS3NK_Rel.createNoTable ())
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
       | (true, _, _, _, _) -> "test123_p2 passed"
