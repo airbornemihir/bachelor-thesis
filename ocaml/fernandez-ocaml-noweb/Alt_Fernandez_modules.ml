@@ -532,13 +532,14 @@ module NK_Rel =
 	         (true, [], yes_table, no_table)
 	      )
             in
-            let
-                l_p =
-              (List.map
-                 (function (n, k) -> (n, k + 1))
-                 l_p
-              )
-	    in
+            (* We are commenting this because its function has been forgotten. *)
+            (* let *)
+            (*     l_p = *)
+            (*   (List.map *)
+            (*      (function (n, k) -> (n, k + 1)) *)
+            (*      l_p *)
+            (*   ) *)
+	    (* in *)
           (* let *)
           (*     () = *)
           (*   Printf.printf *)
@@ -656,13 +657,14 @@ module NK_Rel =
               in
               (f yes_table, f no_table)
             in
-            let
-                l_q =
-              (List.map
-                 (function (n, k) -> (n + 1, k + 1))
-                 l_q
-              )
-	    in
+            (* We are commenting this because its function has been forgotten. *)
+            (* let *)
+            (*     l_q = *)
+            (*   (List.map *)
+            (*      (function (n, k) -> (n + 1, k + 1)) *)
+            (*      l_q *)
+            (*   ) *)
+	    (* in *)
             if
               (v_p && v_q)
             then
