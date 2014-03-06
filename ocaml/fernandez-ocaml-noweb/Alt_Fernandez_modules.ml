@@ -1197,6 +1197,55 @@ module Test =
          (18, 3, 21);
          (19, 3, 22)]
 
+    let l05 =
+      List.fold_left
+        (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
+        IntIntLTS3.empty
+        [(23, 0, 23);
+         (23, 0, 24)]
+
+    let l06 =
+      List.fold_left
+        (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
+        IntIntLTS3.empty
+        [(25, 0, 25)]
+
+    let l07 =
+      List.fold_left
+        (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
+        IntIntLTS3.empty
+        [(26, 0, 27);
+         (26, 0, 28);
+         (27, 0, 29);
+         (27, 1, 30);
+         (28, 0, 30);
+         (29, 0, 26);
+         (30, 0, 26)]
+
+    let l08 =
+      List.fold_left
+        (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
+        IntIntLTS3.empty
+        [(31, 0, 32);
+         (31, 0, 34);
+         (32, 0, 33);
+         (32, 1, 33);
+         (33, 0, 31);
+         (34, 0, 35);
+         (35, 0, 31)]
+
+    let l09 =
+      List.fold_left
+        (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
+        IntIntLTS3.empty
+        [(26, 0, 28);
+         (26, 0, 27);
+         (28, 0, 29);
+         (28, 1, 30);
+         (27, 0, 30);
+         (29, 0, 26);
+         (30, 0, 26)]
+
     let () =
       IntIntLTS3.iter_vertex
         (function v ->
@@ -1208,7 +1257,7 @@ module Test =
 
     module IntIntLTS3NK_Rel = NK_Rel (IntIntLTS3)
 
-    let test120_p1 =
+    let test120 =
       match
         IntIntLTS3NK_Rel.checknkRel
 	  l03
@@ -1221,14 +1270,14 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
-      | (false, _, _, _, _) -> "test120_p1 passed"
-      | (true, _, _, _, _) -> "test120_p1 failed"
+      | (false, _, _, _, _) -> "test120 passed"
+      | (true, _, _, _, _) -> "test120 failed"
 
     (* Shibashis: I assume that true means the defender has won
        and the relation holds when the challenger starts with l03 in
        the first round *)
         
-    let test120_p2 =  (* Shibashis: Challenger chooses now l04 in the
+    let test121 =  (* Shibashis: Challenger chooses now l04 in the
     first round *)
       match
         IntIntLTS3NK_Rel.checknkRel
@@ -1242,10 +1291,10 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
-      | (true, _, _, _, _) -> "test120_p2 passed"
-      | (false, _, _, _, _) -> "test120_p2 failed"
+      | (true, _, _, _, _) -> "test121 passed"
+      | (false, _, _, _, _) -> "test121 failed"
 
-    let test121_p1 =
+    let test122 =
       match
         IntIntLTS3NK_Rel.checknkRel
 	  l03
@@ -1258,14 +1307,14 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
-      | (true, _, _, _, _) -> "test121_p1 passed"
-      | (false, _, _, _, _) -> "test121_p1 failed"
+      | (true, _, _, _, _) -> "test122 passed"
+      | (false, _, _, _, _) -> "test122 failed"
 
     (* Shibashis: I assume that true means the defender has won
        and the relation holds when the challenger starts with l03 in
        the first round *)
         
-    let test121_p2 =  (* Shibashis: Challenger chooses now l04 in the
+    let test123 =  (* Shibashis: Challenger chooses now l04 in the
     first round *)
       match
         IntIntLTS3NK_Rel.checknkRel
@@ -1279,10 +1328,10 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
-      | (true, _, _, _, _) -> "test121_p2 passed"
-      | (false, _, _, _, _) -> "test121_p2 failed"
+      | (true, _, _, _, _) -> "test123 passed"
+      | (false, _, _, _, _) -> "test123 failed"
 
-    let test122_p1 =
+    let test124 =
       match
         IntIntLTS3NK_Rel.checknkRel
 	  l03
@@ -1295,14 +1344,14 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
-      | (false, _, _, _, _) -> "test122_p1 passed"
-      | (true, _, _, _, _) -> "test122_p1 failed"
+      | (false, _, _, _, _) -> "test124 passed"
+      | (true, _, _, _, _) -> "test124 failed"
 
     (* Shibashis: I assume that true means the defender has won
        and the relation holds when the challenger starts with l03 in
        the first round *)
         
-    let test122_p2 =  (* Shibashis: Challenger chooses now l04 in the
+    let test125 =  (* Shibashis: Challenger chooses now l04 in the
     first round *)
       match
         IntIntLTS3NK_Rel.checknkRel
@@ -1316,10 +1365,10 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
-      | (true, _, _, _, _) -> "test122_p2 passed"
-      | (false, _, _, _, _) -> "test122_p2 failed"
+      | (true, _, _, _, _) -> "test125 passed"
+      | (false, _, _, _, _) -> "test125 failed"
 
-    let test123_p1 =
+    let test126 =
       match
         IntIntLTS3NK_Rel.checknkRel
 	  l03
@@ -1332,14 +1381,14 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
-      | (true, _, _, _, _) -> "test123_p1 passed"
-      | (false, _, _, _, _) -> "test123_p1 failed"
+      | (true, _, _, _, _) -> "test126 passed"
+      | (false, _, _, _, _) -> "test126 failed"
 
     (* Shibashis: I assume that true means the defender has won
        and the relation holds when the challenger starts with l03 in
        the first round *)
         
-    let test123_p2 =  (* Shibashis: Challenger chooses now l04 in the
+    let test127 =  (* Shibashis: Challenger chooses now l04 in the
     first round *)
       match
         IntIntLTS3NK_Rel.checknkRel
@@ -1353,7 +1402,136 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
-      | (true, _, _, _, _) -> "test123_p2 passed"
-      | (false, _, _, _, _) -> "test123_p2 failed"
+      | (true, _, _, _, _) -> "test127 passed"
+      | (false, _, _, _, _) -> "test127 failed"
 
+    let test128 =
+      match
+        IntIntLTS3NK_Rel.checknkRel
+	  l05
+	  l06
+	  23
+	  25
+	  1
+	  2
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
+	  ()
+      with
+      | (false, _, _, _, _) -> "test128 passed"
+      | (true, _, _, _, _) -> "test128 failed"
+
+    let test129 =
+      match
+        IntIntLTS3NK_Rel.checknkRel
+          l05
+          l06
+          23
+          25
+          0
+          2
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
+          ()
+      with
+      | (true, _, _, _, _) -> "test129 passed"
+      | (false, _, _, _, _) -> "test129 failed"
+
+    let test130 =
+      match
+        IntIntLTS3NK_Rel.checknkRel
+          l05
+          l06
+          23
+          25
+          0
+          5
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
+          ()
+      with
+      | (true, _, _, _, _) -> "test130 passed"
+      | (false, _, _, _, _) -> "test130 failed"
+
+    let test131 =
+      match
+        IntIntLTS3NK_Rel.checknkRel
+          l06
+          l05
+          25
+          23
+          1
+          2
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
+          ()
+      with
+      | (true, _, _, _, _) -> "test131 passed"
+      | (false, _, _, _, _) -> "test131 failed"
+
+    let test132 =
+      match
+        IntIntLTS3NK_Rel.checknkRel
+          l06
+          l05
+          25
+          23
+          2
+          3
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
+          ()
+      with
+      | (false, _, _, _, _) -> "test132 passed"
+      | (true, _, _, _, _) -> "test132 failed"
+
+    let test133 =
+      match
+        IntIntLTS3NK_Rel.checknkRel
+          l06
+          l05
+          25
+          23
+          4
+          10
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
+          ()
+      with
+      | (false, _, _, _, _) -> "test133 passed"
+      | (true, _, _, _, _) -> "test133 failed"
+
+    let test134 =
+      match
+        IntIntLTS3NK_Rel.checknkRel
+          l07
+          l08
+          26
+          31
+          10
+          20
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
+          ()
+      with
+      | (true, _, _, _, _) -> "test134 passed"
+      | (false, _, _, _, _) -> "test134 failed"
+
+    let test135 =
+      match
+        IntIntLTS3NK_Rel.checknkRel
+          l08
+          l07
+          32
+          28
+          0
+          1
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
+          ()
+      with
+      | (false, _, _, _, _) -> "test135 passed"
+      | (true, _, _, _, _) -> "test135 failed"
+        
       end)
+
