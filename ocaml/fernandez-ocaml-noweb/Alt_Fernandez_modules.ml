@@ -407,8 +407,9 @@ module NK_Rel =
 	  k
           yes_table
           no_table
-	  rel = (* rel is some specific relation, can be a prebisim or
-                   a simulation equivalence or a bisimulation *)
+          (* rel is some specific relation, can be a prebisim or a
+             simulation equivalence or a bisimulation *)
+	  rel = 
         let
             () =
           Printf.printf
@@ -422,10 +423,10 @@ module NK_Rel =
             result = (
           if k = 0 then (true, [], [], yes_table, no_table)
           (* The function checkEntry checks if there is at least one
-             entry for p, q with both remaining number of alternations and
-             remaining number of rounds to be greater than n and k
-             respectively. If not then p, q with current n, k values are
-             added in the function getEntry and *)
+             entry for p, q with both remaining number of alternations
+             and remaining number of rounds to be greater than n and k
+             respectively. If not then p, q with current n, k values
+             are added in the function getEntry and *)
           else if check_entry_yes_table yes_table p q n k  
           then (true, [], [], yes_table, no_table)
           else if check_entry_no_table no_table p q n k
@@ -532,13 +533,14 @@ module NK_Rel =
                    if
                      (not match_found)
                    then
+                     (* this is the base case for entry into the
+                        no_table. The challenger can perform one move
+                        right here which the defender cannot
+                        replicate. *)
                      (false,
                       (0, 1) :: l_q,
                       partial_yes_table,
-                      partial_no_table) (* this is the base case
-                                           for entry into the
-                                           no_table. The challenger can perform one move right here which the
-                                           defender cannot replicate. *)
+                      partial_no_table) 
                    else
 	             (partial_v_p && v_q,
                       partial_l_p @ l_q,  (*this can be
@@ -582,7 +584,8 @@ module NK_Rel =
         let
             () =
           Printf.printf
-            "about to pop p = %s, q = %s, n = %s, k = %s, defender_won = %s\n"
+            "about to pop p = %s, q = %s, n = %s, k = %s, \
+ defender_won = %s, \nl_p = [%s], no_table = [%s]\n"
             (LTS.vertex_name p)
             (LTS.vertex_name q)
             (string_of_int n)
@@ -590,6 +593,26 @@ module NK_Rel =
             (match result with
             | (true, _, _, _, _) -> "true"
             | (false, _, _, _, _) -> "false"
+            )
+            (match result with
+            | (_, l_p, _, _, _) ->
+              String.concat
+                ", "
+                (List.map
+                   (function (n1, k1) -> "(" ^ (string_of_int n1) ^
+                     ", " ^ (string_of_int k1) ^ ")")
+                   l_p
+                )
+            )
+            (match result with
+            | (_, _, _, _, no_table) ->
+              String.concat
+                ", "
+                (List.map
+                   (function (p1, q1, n1, k1) ->
+                     "(" ^ (LTS.vertex_name p1) ^ ", " ^ (LTS.vertex_name q1) ^ ", " ^ (string_of_int n1) ^ ", " ^ (string_of_int k1) ^ ")")
+                   no_table
+                )
             )
         in
         result
