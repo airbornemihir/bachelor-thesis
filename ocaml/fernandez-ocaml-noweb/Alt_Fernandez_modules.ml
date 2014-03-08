@@ -442,11 +442,11 @@ module NK_Rel =
               (* This fold deals with all the successors of p,
                  universal quantification.*)
               (LTS.fold_succ_e
-	         (fun e_p (partial_v_p, partial_l_p, partial_yes_table, partial_no_table) ->
+	         (fun e_p (partial_v_p, partial_l_p, yes_table, no_table) ->
                    let
                        (match_found, v_q, l_q,
-                        partial_yes_table,
-                        partial_no_table) =
+                        yes_table,
+                        no_table) =
                      (* This fold deals with all the successors of q,
                         existential quantification.*)
                      (LTS.fold_succ_e
@@ -454,21 +454,21 @@ module NK_Rel =
                           (partial_match_found,
                            partial_v_q,
                            partial_l_q,
-                           partial_yes_table,
-                           partial_no_table) ->
+                           yes_table,
+                           no_table) ->
                             if (LTS.A.compare (LTS.E.label e_p) (LTS.E.label e_q) <> 0)
                             then
                               (partial_match_found,
                                partial_v_q,
                                partial_l_q,
-                               partial_yes_table,
-                               partial_no_table)
+                               yes_table,
+                               no_table)
                             else
                               let
                                   (* this is when we do not switch sides.*)
                                   (v_pp, l_pp, _,
-                                   partial_yes_table,
-                                   partial_no_table) =
+                                   yes_table,
+                                   no_table) =
                                 (checknkRel
 		                   lts1
 		                   lts2
@@ -476,23 +476,23 @@ module NK_Rel =
 		                   (LTS.E.dst e_q)
 		                   (n)
 		                   (k - 1)
-                                   partial_yes_table
-                                   partial_no_table
+                                   yes_table
+                                   no_table
 		                   rel)
                               in
                               let
                                   (* this is when we switch sides.*)
                                   (v_qq, l_qq, _,
-                                   partial_yes_table,
-                                   partial_no_table) =
+                                   yes_table,
+                                   no_table) =
                                 if
                                   (n < 1)
                                 then
                                   (true,
                                    [],
                                    [],
-                                   partial_yes_table,
-                                   partial_no_table)
+                                   yes_table,
+                                   no_table)
                                 else
                                   (checknkRel
 		                     lts2
@@ -501,8 +501,8 @@ module NK_Rel =
 		                     (LTS.E.dst e_p)
 		                     (n - 1)
 		                     (k - 1)
-                                     partial_yes_table
-                                     partial_no_table
+                                     yes_table
+                                     no_table
 		                     rel)
                               in
 		              (true,
@@ -521,8 +521,8 @@ module NK_Rel =
                                      max value of (n, k) in
                                      cases where a comparison
                                      is possible.*),
-                               partial_yes_table,
-                               partial_no_table
+                               yes_table,
+                               no_table
                               )
 		        )
 		        lts2
@@ -539,8 +539,8 @@ module NK_Rel =
                         replicate. *)
                      (false,
                       (0, 1) :: l_q,
-                      partial_yes_table,
-                      partial_no_table) 
+                      yes_table,
+                      no_table) 
                    else
 	             (partial_v_p && v_q,
                       partial_l_p @ l_q,  (*this can be
@@ -549,8 +549,8 @@ module NK_Rel =
                                             min value of (n, k) in
                                             cases where a comparison
                                             is possible.*)
-                      partial_yes_table,
-                      partial_no_table
+                      yes_table,
+                      no_table
                      )
 	         )
 	         lts1
