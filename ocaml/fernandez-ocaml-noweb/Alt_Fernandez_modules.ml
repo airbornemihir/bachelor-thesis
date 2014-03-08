@@ -486,7 +486,7 @@ module NK_Rel =
                                    yes_table,
                                    no_table) =
                                 if
-                                  (n < 1)
+                                  (n = 0)
                                 then
                                   (true,
                                    [],
@@ -1116,6 +1116,33 @@ module Test =
          (27, 0, 30);
          (29, 0, 26);
          (30, 0, 26)]
+
+    let l10 =
+      List.fold_left
+        (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
+        IntIntLTS3.empty
+        [(31, 0, 32);
+         (31, 0, 34);
+         (32, 0, 33);
+         (32, 1, 33);
+         (33, 0, 31);
+         (34, 0, 35);
+         (35, 0, 31);
+         (31, 0, 36);
+         (36, 0, 37);
+         (37, 0, 31)]
+
+    let l11 =
+      List.fold_left
+        (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
+        IntIntLTS3.empty
+        [(38, 0, 38)]
+
+    let l12 =
+      List.fold_left
+        (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
+        IntIntLTS3.empty
+        [(39, 0, 39)]
 
     let () =
       IntIntLTS3.iter_vertex
