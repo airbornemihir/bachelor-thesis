@@ -353,9 +353,34 @@ module NK_yes_table_functor =
 
      end)
 
+module HM_Formula =
+  functor (LTS: LTS_TYPE) ->
+    (struct
+
+      type hm_formula =
+      | TT
+      | FF
+      | DIAMOND of LTS.A.t * hm_formula
+      | BOX of LTS.A.t * hm_formula
+      | AND of hm_formula * hm_formula
+      | OR of hm_formula * hm_formula
+
+      let rec negation formula =
+        match formula with
+        | TT -> FF
+        | FF -> TT
+        | DIAMOND (a, formula) -> BOX (a, negation formula)
+        | BOX (a, formula) -> DIAMOND (a, negation formula)
+        | AND (formula1, formula2) -> OR (negation formula1, negation formula2)
+        | OR (formula1, formula2) -> AND (negation formula1, negation formula2)
+          
+     end)
+
 module NK_Rel =
   functor (LTS: LTS_TYPE) ->
     (struct
+
+      include HM_Formula(LTS)
 
       let check_entry_yes_table yes_table p q n k =
         List.exists
@@ -1430,6 +1455,104 @@ module Test =
       with
       | (false, _, _, _, _) -> "test135 passed"
       | (true, _, _, _, _) -> "test135 failed"
-        
+
+    let f01 =
+      IntIntLTS3NK_Rel.DIAMOND
+        (0,
+         IntIntLTS3NK_Rel.BOX
+           (1,
+            IntIntLTS3NK_Rel.DIAMOND
+              (2,
+               IntIntLTS3NK_Rel.TT)))
+
+    let f02 =
+      IntIntLTS3NK_Rel.BOX
+        (0,
+         IntIntLTS3NK_Rel.DIAMOND
+           (1,
+            IntIntLTS3NK_Rel.BOX
+              (2,
+               IntIntLTS3NK_Rel.FF)))
+
+    let test136 =
+      if
+        (IntIntLTS3NK_Rel.negation f01 = f02)
+      then
+        "test136 passed"
+      else
+        "test136 failed"
+
+    let test137 =
+      if
+        (IntIntLTS3NK_Rel.negation f02 = f01)
+      then
+        "test137 passed"
+      else
+        "test137 failed"
+
+    let f03 =
+      (let
+          sf01 =
+         IntIntLTS3NK_Rel.DIAMOND
+           (1,
+            IntIntLTS3NK_Rel.BOX
+              (2,
+               IntIntLTS3NK_Rel.DIAMOND
+                 (3,
+                  IntIntLTS3NK_Rel.TT)))
+       in
+       let
+           sf02 =
+         IntIntLTS3NK_Rel.AND
+           (IntIntLTS3NK_Rel.BOX (4, IntIntLTS3NK_Rel.FF),
+            IntIntLTS3NK_Rel.BOX (5, IntIntLTS3NK_Rel.FF))
+       in
+       IntIntLTS3NK_Rel.BOX
+         (0,
+          IntIntLTS3NK_Rel.OR
+            (sf01,
+             IntIntLTS3NK_Rel.BOX
+               (1, sf02))))
+
+    let f04 =
+      (let
+          sf01 =
+         IntIntLTS3NK_Rel.BOX
+           (1,
+            IntIntLTS3NK_Rel.DIAMOND
+              (2,
+               IntIntLTS3NK_Rel.BOX
+                 (3,
+                  IntIntLTS3NK_Rel.FF)))
+       in
+       let
+           sf02 =
+         IntIntLTS3NK_Rel.OR
+           (IntIntLTS3NK_Rel.DIAMOND (4, IntIntLTS3NK_Rel.TT),
+            IntIntLTS3NK_Rel.DIAMOND (5, IntIntLTS3NK_Rel.TT))
+       in
+       IntIntLTS3NK_Rel.DIAMOND
+         (0,
+          IntIntLTS3NK_Rel.AND
+            (sf01,
+             IntIntLTS3NK_Rel.DIAMOND
+               (1, sf02))))
+
+    let test138 =
+      if
+        (IntIntLTS3NK_Rel.negation f03 = f04)
+      then
+        "test138 passed"
+      else
+        "test138 failed"
+
+    let test139 =
+      if
+        (IntIntLTS3NK_Rel.negation f04 = f03)
+      then
+        "test139 passed"
+      else
+        "test139 failed"
+
       end)
 
