@@ -442,16 +442,16 @@ module NK_Rel =
         in
         let
             result = (
-          if k = 0 then (true, [], [], yes_table, no_table)
+          if k = 0 then (true, [], yes_table, no_table)
           (* The function checkEntry checks if there is at least one
              entry for p, q with both remaining number of alternations
              and remaining number of rounds to be greater than n and k
              respectively. If not then p, q with current n, k values
              are added in the function getEntry and *)
           else if check_entry_yes_table yes_table p q n k  
-          then (true, [], [], yes_table, no_table)
+          then (true, [], yes_table, no_table)
           else if check_entry_no_table no_table p q n k
-          then (false, [], [], yes_table, no_table)
+          then (false, [], yes_table, no_table)
           else (
 	    (* now we can remove all entries in which the n-value is not
                greater than n and the k-value is not greater than k. *)
@@ -487,7 +487,7 @@ module NK_Rel =
                             else
                               let
                                   (* this is when we do not switch sides.*)
-                                  (v_pp, l_pp, _,
+                                  (v_pp, l_pp,
                                    yes_table,
                                    no_table) =
                                 (checknkRel
@@ -503,14 +503,13 @@ module NK_Rel =
                               in
                               let
                                   (* this is when we switch sides.*)
-                                  (v_qq, l_qq, _,
+                                  (v_qq, l_qq,
                                    yes_table,
                                    no_table) =
                                 if
                                   (n = 0)
                                 then
                                   (true,
-                                   [],
                                    [],
                                    yes_table,
                                    no_table)
@@ -584,15 +583,13 @@ module NK_Rel =
             then
 	      (true,
                l_p,
-               [],
                yes_table,
                no_table)
             else
 	      (false,
-               l_p,
-               [], (* we need to return a list of pairs of the form (n,
-                      k) which denotes the various pairs of values of n
-                      and k for which the challenger wins.*)
+               l_p, (* we need to return a list of pairs of the form (n,
+                       k) which denotes the various pairs of values of n
+                       and k for which the challenger wins.*)
                remove_entry_yes_table yes_table p q n k,
                List.fold_left
                  (fun no_table (n1, k1) -> add_entry_no_table no_table p q n1 k1)
@@ -612,11 +609,11 @@ module NK_Rel =
             (string_of_int n)
             (string_of_int k)
             (match result with
-            | (true, _, _, _, _) -> "true"
-            | (false, _, _, _, _) -> "false"
+            | (true, _, _, _) -> "true"
+            | (false, _, _, _) -> "false"
             )
             (match result with
-            | (_, l_p, _, _, _) ->
+            | (_, l_p, _, _) ->
               String.concat
                 ", "
                 (List.map
@@ -626,7 +623,7 @@ module NK_Rel =
                 )
             )
             (match result with
-            | (_, _, _, _, no_table) ->
+            | (_, _, _, no_table) ->
               String.concat
                 ", "
                 (List.map
@@ -1189,8 +1186,8 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
-      | (false, _, _, _, _) -> "test120 passed"
-      | (true, _, _, _, _) -> "test120 failed"
+      | (false, _, _, _) -> "test120 passed"
+      | (true, _, _, _) -> "test120 failed"
 
     (* Shibashis: I assume that true means the defender has won
        and the relation holds when the challenger starts with l03 in
@@ -1210,8 +1207,8 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
-      | (true, _, _, _, _) -> "test121 passed"
-      | (false, _, _, _, _) -> "test121 failed"
+      | (true, _, _, _) -> "test121 passed"
+      | (false, _, _, _) -> "test121 failed"
 
     let test122 =
       match
@@ -1226,8 +1223,8 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
-      | (true, _, _, _, _) -> "test122 passed"
-      | (false, _, _, _, _) -> "test122 failed"
+      | (true, _, _, _) -> "test122 passed"
+      | (false, _, _, _) -> "test122 failed"
 
     (* Shibashis: I assume that true means the defender has won
        and the relation holds when the challenger starts with l03 in
@@ -1247,8 +1244,8 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
-      | (true, _, _, _, _) -> "test123 passed"
-      | (false, _, _, _, _) -> "test123 failed"
+      | (true, _, _, _) -> "test123 passed"
+      | (false, _, _, _) -> "test123 failed"
 
     let test124 =
       match
@@ -1263,8 +1260,8 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
-      | (false, _, _, _, _) -> "test124 passed"
-      | (true, _, _, _, _) -> "test124 failed"
+      | (false, _, _, _) -> "test124 passed"
+      | (true, _, _, _) -> "test124 failed"
 
     (* Shibashis: I assume that true means the defender has won
        and the relation holds when the challenger starts with l03 in
@@ -1284,8 +1281,8 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
-      | (true, _, _, _, _) -> "test125 passed"
-      | (false, _, _, _, _) -> "test125 failed"
+      | (true, _, _, _) -> "test125 passed"
+      | (false, _, _, _) -> "test125 failed"
 
     let test126 =
       match
@@ -1300,8 +1297,8 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
-      | (true, _, _, _, _) -> "test126 passed"
-      | (false, _, _, _, _) -> "test126 failed"
+      | (true, _, _, _) -> "test126 passed"
+      | (false, _, _, _) -> "test126 failed"
 
     (* Shibashis: I assume that true means the defender has won
        and the relation holds when the challenger starts with l03 in
@@ -1321,8 +1318,8 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
-      | (true, _, _, _, _) -> "test127 passed"
-      | (false, _, _, _, _) -> "test127 failed"
+      | (true, _, _, _) -> "test127 passed"
+      | (false, _, _, _) -> "test127 failed"
 
     let test128 =
       match
@@ -1337,8 +1334,8 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
 	  ()
       with
-      | (false, _, _, _, _) -> "test128 passed"
-      | (true, _, _, _, _) -> "test128 failed"
+      | (false, _, _, _) -> "test128 passed"
+      | (true, _, _, _) -> "test128 failed"
 
     let test129 =
       match
@@ -1353,8 +1350,8 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
           ()
       with
-      | (true, _, _, _, _) -> "test129 passed"
-      | (false, _, _, _, _) -> "test129 failed"
+      | (true, _, _, _) -> "test129 passed"
+      | (false, _, _, _) -> "test129 failed"
 
     let test130 =
       match
@@ -1369,8 +1366,8 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
           ()
       with
-      | (true, _, _, _, _) -> "test130 passed"
-      | (false, _, _, _, _) -> "test130 failed"
+      | (true, _, _, _) -> "test130 passed"
+      | (false, _, _, _) -> "test130 failed"
 
     let test131 =
       match
@@ -1385,8 +1382,8 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
           ()
       with
-      | (true, _, _, _, _) -> "test131 passed"
-      | (false, _, _, _, _) -> "test131 failed"
+      | (true, _, _, _) -> "test131 passed"
+      | (false, _, _, _) -> "test131 failed"
 
     let test132 =
       match
@@ -1401,8 +1398,8 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
           ()
       with
-      | (false, _, _, _, _) -> "test132 passed"
-      | (true, _, _, _, _) -> "test132 failed"
+      | (false, _, _, _) -> "test132 passed"
+      | (true, _, _, _) -> "test132 failed"
 
     let test133 =
       match
@@ -1417,8 +1414,8 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
           ()
       with
-      | (false, _, _, _, _) -> "test133 passed"
-      | (true, _, _, _, _) -> "test133 failed"
+      | (false, _, _, _) -> "test133 passed"
+      | (true, _, _, _) -> "test133 failed"
 
     let test134 =
       match
@@ -1433,8 +1430,8 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
           ()
       with
-      | (true, _, _, _, _) -> "test134 passed"
-      | (false, _, _, _, _) -> "test134 failed"
+      | (true, _, _, _) -> "test134 passed"
+      | (false, _, _, _) -> "test134 failed"
 
     let test135 =
       match
@@ -1449,8 +1446,8 @@ module Test =
           (IntIntLTS3NK_Rel.create_no_table ())
           ()
       with
-      | (false, _, _, _, _) -> "test135 passed"
-      | (true, _, _, _, _) -> "test135 failed"
+      | (false, _, _, _) -> "test135 passed"
+      | (true, _, _, _) -> "test135 failed"
 
     let f01 =
       IntIntLTS3NK_Rel.DIAMOND
