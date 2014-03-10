@@ -358,21 +358,17 @@ module HM_Formula =
     (struct
 
       type hm_formula =
-      | TT
-      | FF
       | DIAMOND of LTS.A.t * hm_formula
       | BOX of LTS.A.t * hm_formula
-      | AND of hm_formula * hm_formula
-      | OR of hm_formula * hm_formula
+      | AND of hm_formula list (*AND [] is true.*)
+      | OR of hm_formula list (* OR [] is false.*)
 
       let rec negation formula =
         match formula with
-        | TT -> FF
-        | FF -> TT
         | DIAMOND (a, formula) -> BOX (a, negation formula)
         | BOX (a, formula) -> DIAMOND (a, negation formula)
-        | AND (formula1, formula2) -> OR (negation formula1, negation formula2)
-        | OR (formula1, formula2) -> AND (negation formula1, negation formula2)
+        | AND formula_list -> OR (List.map negation formula_list)
+        | OR formula_list -> AND (List.map negation formula_list)
           
      end)
 
@@ -1463,7 +1459,7 @@ module Test =
            (1,
             IntIntLTS3NK_Rel.DIAMOND
               (2,
-               IntIntLTS3NK_Rel.TT)))
+               IntIntLTS3NK_Rel.AND [])))
 
     let f02 =
       IntIntLTS3NK_Rel.BOX
@@ -1472,7 +1468,7 @@ module Test =
            (1,
             IntIntLTS3NK_Rel.BOX
               (2,
-               IntIntLTS3NK_Rel.FF)))
+               IntIntLTS3NK_Rel.OR [])))
 
     let test136 =
       if
@@ -1499,20 +1495,20 @@ module Test =
               (2,
                IntIntLTS3NK_Rel.DIAMOND
                  (3,
-                  IntIntLTS3NK_Rel.TT)))
+                  IntIntLTS3NK_Rel.AND [])))
        in
        let
            sf02 =
          IntIntLTS3NK_Rel.AND
-           (IntIntLTS3NK_Rel.BOX (4, IntIntLTS3NK_Rel.FF),
-            IntIntLTS3NK_Rel.BOX (5, IntIntLTS3NK_Rel.FF))
+           [IntIntLTS3NK_Rel.BOX (4, IntIntLTS3NK_Rel.OR []);
+            IntIntLTS3NK_Rel.BOX (5, IntIntLTS3NK_Rel.OR [])]
        in
        IntIntLTS3NK_Rel.BOX
          (0,
           IntIntLTS3NK_Rel.OR
-            (sf01,
+            [sf01;
              IntIntLTS3NK_Rel.BOX
-               (1, sf02))))
+               (1, sf02)]))
 
     let f04 =
       (let
@@ -1523,20 +1519,20 @@ module Test =
               (2,
                IntIntLTS3NK_Rel.BOX
                  (3,
-                  IntIntLTS3NK_Rel.FF)))
+                  IntIntLTS3NK_Rel.OR [])))
        in
        let
            sf02 =
          IntIntLTS3NK_Rel.OR
-           (IntIntLTS3NK_Rel.DIAMOND (4, IntIntLTS3NK_Rel.TT),
-            IntIntLTS3NK_Rel.DIAMOND (5, IntIntLTS3NK_Rel.TT))
+           [IntIntLTS3NK_Rel.DIAMOND (4, IntIntLTS3NK_Rel.AND []);
+            IntIntLTS3NK_Rel.DIAMOND (5, IntIntLTS3NK_Rel.AND [])]
        in
        IntIntLTS3NK_Rel.DIAMOND
          (0,
           IntIntLTS3NK_Rel.AND
-            (sf01,
+            [sf01;
              IntIntLTS3NK_Rel.DIAMOND
-               (1, sf02))))
+               (1, sf02)]))
 
     let test138 =
       if
