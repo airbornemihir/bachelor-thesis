@@ -384,18 +384,13 @@ module NK_Rel =
             (p1 = p) && (q1 = q) && (n1 >= n) && (k1 >= k))
           yes_table
 
-      let fetch_entry_no_table no_table p q n k =
-        try
-          let
-              (p1, q1, n1, k1, f1) =
-            List.find
-              (function (p1, q1, n1, k1, f1) ->
-                (p1 = p) && (q1 = q) && (n1 <= n) && (k1 <= k))
-              no_table
-          in
-          Some f1
-        with
-        | Not_found -> None
+      let fetch_entries_no_table no_table p q n k =
+        List.map
+          (function (_, _, n1, k1, f1) -> (n1, k1, f1))
+          (List.filter
+             (function (p1, q1, n1, k1, f1) ->
+               (p1 = p) && (q1 = q) && (n1 <= n) && (k1 <= k))
+             no_table)
 
       let add_entry_yes_table yes_table p q n k =
         (p, q, n, k)::
@@ -426,7 +421,7 @@ module NK_Rel =
          q now and makes a move in lts2, then we use up one alternation,
          otherwise we have the same number of alternations remaining.*)
       let rec
-	  get_distinguishing_formula
+	  get_distinguishing_formulae
 	  lts1
 	  lts2
 	  p
@@ -459,7 +454,7 @@ module NK_Rel =
           then ([], yes_table, no_table)
           else
             match
-              fetch_entry_no_table no_table p q n k
+              fetch_entries_no_table no_table p q n k
             with
               (* this next bit worries me somewhat. are we actually
                  reporting inaccurate values for n and k? because f
@@ -472,8 +467,8 @@ module NK_Rel =
                  results based on whether or not a match is found in
                  the no_table. if it's not, then we evaluate and
                  return everything, otherwise, just the first. *)
-            | Some f -> ([(n, k, f)], yes_table, no_table) 
-            | None -> (
+            | hd::tl -> (hd::tl, yes_table, no_table) 
+            | [] -> (
 	    (* now we can remove all entries in which the n-value is not
                greater than n and the k-value is not greater than k. *)
 	      let yes_table = add_entry_yes_table yes_table p q n k in
@@ -511,7 +506,7 @@ module NK_Rel =
                                     (l_pp,
                                      yes_table,
                                      no_table) =
-                                  (get_distinguishing_formula
+                                  (get_distinguishing_formulae
 		                     lts1
 		                     lts2
 		                     (LTS.E.dst e_p)
@@ -543,7 +538,7 @@ module NK_Rel =
                                      yes_table,
                                      no_table)
                                   else
-                                    (get_distinguishing_formula
+                                    (get_distinguishing_formulae
 		                       lts2
 		                       lts1
 		                       (LTS.E.dst e_q)
@@ -668,7 +663,7 @@ module NK_Rel =
              simulation equivalence or a bisimulation *)
 	  rel = 
         match
-          (get_distinguishing_formula
+          (get_distinguishing_formulae
 	    lts1
 	    lts2
 	    p
