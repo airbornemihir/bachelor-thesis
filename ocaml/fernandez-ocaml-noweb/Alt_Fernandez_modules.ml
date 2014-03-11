@@ -384,11 +384,18 @@ module NK_Rel =
             (p1 = p) && (q1 = q) && (n1 >= n) && (k1 >= k))
           yes_table
 
-      let check_entry_no_table no_table p q n k = 
-        List.exists
-          (function (p1, q1, n1, k1) ->
-            (p1 = p) && (q1 = q) && (n1 <= n) && (k1 <= k))
-          no_table
+      let fetch_entry_no_table no_table p q n k =
+        try
+          let
+              (p1, q1, n1, k1, f1) =
+            List.find
+              (function (p1, q1, n1, k1, f1) ->
+                (p1 = p) && (q1 = q) && (n1 <= n) && (k1 <= k))
+              no_table
+          in
+          Some f1
+        with
+        | Not_found -> None
 
       let add_entry_yes_table yes_table p q n k =
         (p, q, n, k)::
@@ -397,10 +404,10 @@ module NK_Rel =
                (p1 <> p) || (q1 <> q) || (n1 > n) || (k1 > k))
              yes_table)
 
-      let add_entry_no_table no_table p q n k =
-        (p, q, n, k)::
+      let add_entry_no_table no_table p q n k f =
+        (p, q, n, k, f)::
           (List.filter
-             (function (p1, q1, n1, k1) ->
+             (function (p1, q1, n1, k1, f1) ->
                (p1 <> p) || (q1 <> q) || (n1 < n) || (k1 < k))
              no_table)
 
@@ -450,179 +457,182 @@ module NK_Rel =
              are added in the function getEntry and *)
           else if check_entry_yes_table yes_table p q n k  
           then (None, [], yes_table, no_table)
-          else if check_entry_no_table no_table p q n k
-          (* fix this later. *)
-          then (Some (AND []), [], yes_table, no_table) 
-          else (
+          else
+            match
+              fetch_entry_no_table no_table p q n k
+            with
+            | Some f -> (Some f, [], yes_table, no_table) 
+            | None -> (
 	    (* now we can remove all entries in which the n-value is not
                greater than n and the k-value is not greater than k. *)
-	    let yes_table = add_entry_yes_table yes_table p q n k in
+	      let yes_table = add_entry_yes_table yes_table p q n k in
 	    (* for each successor p' of p, check if that is simulated by
                a successor q' of q *)
-	    let
-	        (v_p, l_p, yes_table, no_table) =
+	      let
+	          (v_p, l_p, yes_table, no_table) =
               (* This fold deals with all the successors of p,
                  universal quantification.*)
-              (LTS.fold_succ_e
-	         (fun e_p (partial_v_p, partial_l_p, yes_table, no_table) ->
-                   let
-                       (match_found, v_q, l_q,
-                        yes_table,
-                        no_table) =
+                (LTS.fold_succ_e
+	           (fun e_p (partial_v_p, partial_l_p, yes_table, no_table) ->
+                     let
+                         (match_found, v_q, l_q,
+                          yes_table,
+                          no_table) =
                      (* This fold deals with all the successors of q,
                         existential quantification.*)
-                     (LTS.fold_succ_e
-		        (fun e_q
-                          (partial_match_found,
-                           partial_v_q,
-                           partial_l_q,
-                           yes_table,
-                           no_table) ->
-                            if (LTS.A.compare (LTS.E.label e_p) (LTS.E.label e_q) <> 0)
-                            then
-                              (partial_match_found,
-                               partial_v_q,
-                               partial_l_q,
-                               yes_table,
-                               no_table)
-                            else
-                              let
+                       (LTS.fold_succ_e
+		          (fun e_q
+                            (partial_match_found,
+                             partial_v_q,
+                             partial_l_q,
+                             yes_table,
+                             no_table) ->
+                              if (LTS.A.compare (LTS.E.label e_p) (LTS.E.label e_q) <> 0)
+                              then
+                                (partial_match_found,
+                                 partial_v_q,
+                                 partial_l_q,
+                                 yes_table,
+                                 no_table)
+                              else
+                                let
                                   (* this is when we do not switch sides.*)
-                                  (v_pp, l_pp,
-                                   yes_table,
-                                   no_table) =
-                                (get_distinguishing_formula
-		                   lts1
-		                   lts2
-		                   (LTS.E.dst e_p)
-		                   (LTS.E.dst e_q)
-		                   (n)
-		                   (k - 1)
-                                   yes_table
-                                   no_table
-		                   rel)
-                              in
-                              let
-                                  v_pp =
-                                (match
-                                    v_pp
-                                 with
-                                 | None -> true
-                                 | Some _ -> false
-                                )
-                              in
-                              let
-                                  (* this is when we switch sides.*)
-                                  (v_qq, l_qq,
-                                   yes_table,
-                                   no_table) =
-                                if
-                                  (n = 0)
-                                then
-                                  (None,
-                                   [],
-                                   yes_table,
-                                   no_table)
-                                else
+                                    (v_pp, l_pp,
+                                     yes_table,
+                                     no_table) =
                                   (get_distinguishing_formula
-		                     lts2
 		                     lts1
-		                     (LTS.E.dst e_q)
+		                     lts2
 		                     (LTS.E.dst e_p)
-		                     (n - 1)
+		                     (LTS.E.dst e_q)
+		                     (n)
 		                     (k - 1)
                                      yes_table
                                      no_table
 		                     rel)
-                              in
-                              let
-                                  v_qq =
-                                (match
-                                    v_qq
-                                 with
-                                 | None -> true
-                                 | Some _ -> false
+                                in
+                                let
+                                    v_pp =
+                                  (match
+                                      v_pp
+                                   with
+                                   | None -> true
+                                   | Some _ -> false
+                                  )
+                                in
+                                let
+                                  (* this is when we switch sides.*)
+                                    (v_qq, l_qq,
+                                     yes_table,
+                                     no_table) =
+                                  if
+                                    (n = 0)
+                                  then
+                                    (None,
+                                     [],
+                                     yes_table,
+                                     no_table)
+                                  else
+                                    (get_distinguishing_formula
+		                       lts2
+		                       lts1
+		                       (LTS.E.dst e_q)
+		                       (LTS.E.dst e_p)
+		                       (n - 1)
+		                       (k - 1)
+                                       yes_table
+                                       no_table
+		                       rel)
+                                in
+                                let
+                                    v_qq =
+                                  (match
+                                      v_qq
+                                   with
+                                   | None -> true
+                                   | Some _ -> false
+                                  )
+                                in
+		                (true,
+                                 partial_v_q || (v_pp && v_qq),
+                                 partial_l_q @
+                                   ((List.map
+                                       (fun (n1, k1) -> (n1, k1 + 1))
+                                       l_pp) (* one more round. *)
+                                    @
+                                      (List.map
+                                         (fun (n1, k1) -> (n1 + 1, k1 + 1))
+                                         l_qq) (* one more round, one more alternation. *)
+                                   ) (*this can be
+                                       optimised. A LOT. Here,
+                                       we should have only the
+                                       max value of (n, k) in
+                                       cases where a comparison
+                                       is possible.*),
+                                 yes_table,
+                                 no_table
                                 )
-                              in
-		              (true,
-                               partial_v_q || (v_pp && v_qq),
-                               partial_l_q @
-                                 ((List.map
-                                     (fun (n1, k1) -> (n1, k1 + 1))
-                                     l_pp) (* one more round. *)
-                                  @
-                                    (List.map
-                                       (fun (n1, k1) -> (n1 + 1, k1 + 1))
-                                       l_qq) (* one more round, one more alternation. *)
-                                 ) (*this can be
-                                     optimised. A LOT. Here,
-                                     we should have only the
-                                     max value of (n, k) in
-                                     cases where a comparison
-                                     is possible.*),
-                               yes_table,
-                               no_table
-                              )
-		        )
-		        lts2
-		        q
-		        (false, false, [], yes_table, no_table)
-	             )
-                   in
-                   if
-                     (not match_found)
-                   then
+		          )
+		          lts2
+		          q
+		          (false, false, [], yes_table, no_table)
+	               )
+                     in
+                     if
+                       (not match_found)
+                     then
                      (* this is the base case for entry into the
                         no_table. The challenger can perform one move
                         right here which the defender cannot
                         replicate. *)
-                     (false,
-                      (0, 1) :: l_q,
-                      yes_table,
-                      no_table) 
-                   else
-	             (partial_v_p && v_q,
-                      partial_l_p @ l_q,  (*this can be
-                                            optimised. A LOT. Here,
-                                            we should have only the
-                                            min value of (n, k) in
-                                            cases where a comparison
-                                            is possible.*)
-                      yes_table,
-                      no_table
-                     )
-	         )
-	         lts1
-	         p
-	         (true, [], yes_table, no_table)
-	      )
-            in
-            if
-              v_p
-            then
-	      (None,
-               l_p,
-               yes_table,
-               no_table)
-            else
-	      (Some (AND []),
-               l_p, (* we need to return a list of pairs of the form (n,
-                       k) which denotes the various pairs of values of n
-                       and k for which the challenger wins.*)
-               remove_entry_yes_table yes_table p q n k,
-               List.fold_left
-                 (fun no_table (n1, k1) -> add_entry_no_table no_table p q n1 k1)
-                 no_table
-                 l_p
-              )
-          )
+                       (false,
+                        (0, 1) :: l_q,
+                        yes_table,
+                        no_table) 
+                     else
+	               (partial_v_p && v_q,
+                        partial_l_p @ l_q,  (*this can be
+                                              optimised. A LOT. Here,
+                                              we should have only the
+                                              min value of (n, k) in
+                                              cases where a comparison
+                                              is possible.*)
+                        yes_table,
+                        no_table
+                       )
+	           )
+	           lts1
+	           p
+	           (true, [], yes_table, no_table)
+	        )
+              in
+              if
+                v_p
+              then
+	        (None,
+                 l_p,
+                 yes_table,
+                 no_table)
+              else
+	        (Some (AND []),
+                 l_p, (* we need to return a list of pairs of the form (n,
+                         k) which denotes the various pairs of values of n
+                         and k for which the challenger wins.*)
+                 remove_entry_yes_table yes_table p q n k,
+                 List.fold_left
+                   (fun no_table (n1, k1) ->
+                     add_entry_no_table no_table p q n1 k1 (AND []))
+                   no_table
+                   l_p
+                )
+            )
         )
         in
         let
             () =
           Printf.printf
-            "about to pop p = %s, q = %s, n = %s, k = %s, \
- defender_won = %s, \nl_p = [%s], no_table = [%s]\n"
+            "about to pop p = %s, q = %s, n = %s, k = %s\n, \
+ defender_won = %s, \n"
             (LTS.vertex_name p)
             (LTS.vertex_name q)
             (string_of_int n)
@@ -630,26 +640,6 @@ module NK_Rel =
             (match result with
             | (None, _, _, _) -> "true"
             | (Some _, _, _, _) -> "false"
-            )
-            (match result with
-            | (_, l_p, _, _) ->
-              String.concat
-                ", "
-                (List.map
-                   (function (n1, k1) -> "(" ^ (string_of_int n1) ^
-                     ", " ^ (string_of_int k1) ^ ")")
-                   l_p
-                )
-            )
-            (match result with
-            | (_, _, _, no_table) ->
-              String.concat
-                ", "
-                (List.map
-                   (function (p1, q1, n1, k1) ->
-                     "(" ^ (LTS.vertex_name p1) ^ ", " ^ (LTS.vertex_name q1) ^ ", " ^ (string_of_int n1) ^ ", " ^ (string_of_int k1) ^ ")")
-                   no_table
-                )
             )
         in
         result
