@@ -449,19 +449,30 @@ module NK_Rel =
         in
         let
             result = (
-          if k = 0 then (None, [], yes_table, no_table)
+          if k = 0 then ([], yes_table, no_table)
           (* The function checkEntry checks if there is at least one
              entry for p, q with both remaining number of alternations
              and remaining number of rounds to be greater than n and k
              respectively. If not then p, q with current n, k values
              are added in the function getEntry and *)
           else if check_entry_yes_table yes_table p q n k  
-          then (None, [], yes_table, no_table)
+          then ([], yes_table, no_table)
           else
             match
               fetch_entry_no_table no_table p q n k
             with
-            | Some f -> (Some f, [], yes_table, no_table) 
+              (* this next bit worries me somewhat. are we actually
+                 reporting inaccurate values for n and k? because f
+                 is not in general placed with n and k in the
+                 no_table. *)
+              (* also, there's this undue preference for the first
+                 value we find in the no_table, thanks to List.find *)
+              (* this stuff is going to have to change soon. we
+                 basically have a loophole where we get different
+                 results based on whether or not a match is found in
+                 the no_table. if it's not, then we evaluate and
+                 return everything, otherwise, just the first. *)
+            | Some f -> ([(n, k, f)], yes_table, no_table) 
             | None -> (
 	    (* now we can remove all entries in which the n-value is not
                greater than n and the k-value is not greater than k. *)
@@ -497,7 +508,7 @@ module NK_Rel =
                               else
                                 let
                                   (* this is when we do not switch sides.*)
-                                    (v_pp, l_pp,
+                                    (l_pp,
                                      yes_table,
                                      no_table) =
                                   (get_distinguishing_formula
@@ -514,22 +525,21 @@ module NK_Rel =
                                 let
                                     v_pp =
                                   (match
-                                      v_pp
+                                      l_pp
                                    with
-                                   | None -> true
-                                   | Some _ -> false
+                                   | [] -> true
+                                   | _ -> false
                                   )
                                 in
                                 let
                                   (* this is when we switch sides.*)
-                                    (v_qq, l_qq,
+                                    (l_qq,
                                      yes_table,
                                      no_table) =
                                   if
                                     (n = 0)
                                   then
-                                    (None,
-                                     [],
+                                    ([],
                                      yes_table,
                                      no_table)
                                   else
@@ -547,23 +557,25 @@ module NK_Rel =
                                 let
                                     v_qq =
                                   (match
-                                      v_qq
+                                      l_qq
                                    with
-                                   | None -> true
-                                   | Some _ -> false
+                                   | [] -> true
+                                   | _ -> false
                                   )
                                 in
 		                (true,
                                  partial_v_q || (v_pp && v_qq),
                                  partial_l_q @
-                                   ((List.map
-                                       (fun (n1, k1) -> (n1, k1 + 1))
-                                       l_pp) (* one more round. *)
-                                    @
-                                      (List.map
-                                         (fun (n1, k1) -> (n1 + 1, k1 + 1))
-                                         l_qq) (* one more round, one more alternation. *)
-                                   ) (*this can be
+                                   (List.map
+                                      (fun (n1, k1, f1) ->
+                                        (n1, k1 + 1, DIAMOND(LTS.E.label e_p, f1)))
+                                      l_pp) (* one more round. *)
+                                 @
+                                   (List.map
+                                      (fun (n1, k1, f1) ->
+                                        (n1 + 1, k1 + 1, DIAMOND(LTS.E.label e_q, negation f1)))
+                                      l_qq) (* one more round, one more alternation. *)
+                                       (*this can be
                                        optimised. A LOT. Here,
                                        we should have only the
                                        max value of (n, k) in
@@ -586,7 +598,7 @@ module NK_Rel =
                         right here which the defender cannot
                         replicate. *)
                        (false,
-                        (0, 1) :: l_q,
+                        (0, 1, DIAMOND(LTS.E.label e_p, AND [])) :: l_q,
                         yes_table,
                         no_table) 
                      else
@@ -609,19 +621,17 @@ module NK_Rel =
               if
                 v_p
               then
-	        (None,
-                 l_p,
+	        (l_p,
                  yes_table,
                  no_table)
               else
-	        (Some (AND []),
-                 l_p, (* we need to return a list of pairs of the form (n,
+	        (l_p, (* we need to return a list of pairs of the form (n,
                          k) which denotes the various pairs of values of n
                          and k for which the challenger wins.*)
                  remove_entry_yes_table yes_table p q n k,
                  List.fold_left
-                   (fun no_table (n1, k1) ->
-                     add_entry_no_table no_table p q n1 k1 (AND []))
+                   (fun no_table (n1, k1, f1) ->
+                     add_entry_no_table no_table p q n1 k1 f1)
                    no_table
                    l_p
                 )
@@ -638,8 +648,8 @@ module NK_Rel =
             (string_of_int n)
             (string_of_int k)
             (match result with
-            | (None, _, _, _) -> "true"
-            | (Some _, _, _, _) -> "false"
+            | ([], _, _) -> "true"
+            | (_, _, _) -> "false"
             )
         in
         result
@@ -670,8 +680,8 @@ module NK_Rel =
             rel
           )
         with
-        | (None, _, _, _) -> true
-        | (Some _, _, _, _) -> false
+        | ([], _, _) -> true
+        | (_, _, _) -> false
      end)
 
 module Test =
