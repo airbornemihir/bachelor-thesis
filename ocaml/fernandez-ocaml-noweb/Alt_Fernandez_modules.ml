@@ -393,6 +393,14 @@ module NK_Rel =
              no_table)
 
       let add_entry_yes_table yes_table p q n k =
+        if
+          (List.exists
+             (function (p1, q1, n1, k1) ->
+               (p1 = p) && (q1 = q) && (n1 >= n) && (k1 >= k))
+             yes_table)
+        then
+          yes_table
+        else
         (p, q, n, k)::
           (List.filter
              (function (p1, q1, n1, k1) ->
@@ -400,11 +408,19 @@ module NK_Rel =
              yes_table)
 
       let add_entry_no_table no_table p q n k f =
-        (p, q, n, k, f)::
-          (List.filter
+        if
+          (List.exists
              (function (p1, q1, n1, k1, f1) ->
-               (p1 <> p) || (q1 <> q) || (n1 < n) || (k1 < k))
+               (p1 = p) && (q1 = q) && (n1 <= n) && (k1 <= k))
              no_table)
+        then
+          no_table
+        else
+          ((p, q, n, k, f)::
+              (List.filter
+                 (function (p1, q1, n1, k1, f1) ->
+                   (p1 <> p) || (q1 <> q) || (n1 < n) || (k1 < k))
+                 no_table))
 
       let remove_entry_yes_table yes_table p q n k =
         List.filter
@@ -456,21 +472,8 @@ module NK_Rel =
             match
               fetch_entries_no_table no_table p q n k
             with
-              (* this next bit worries me somewhat. are we actually
-                 reporting inaccurate values for n and k? because f
-                 is not in general placed with n and k in the
-                 no_table. *)
-              (* also, there's this undue preference for the first
-                 value we find in the no_table, thanks to List.find *)
-              (* this stuff is going to have to change soon. we
-                 basically have a loophole where we get different
-                 results based on whether or not a match is found in
-                 the no_table. if it's not, then we evaluate and
-                 return everything, otherwise, just the first. *)
             | hd::tl -> (hd::tl, yes_table, no_table) 
             | [] -> (
-	    (* now we can remove all entries in which the n-value is not
-               greater than n and the k-value is not greater than k. *)
 	      let yes_table = add_entry_yes_table yes_table p q n k in
 	    (* for each successor p' of p, check if that is simulated by
                a successor q' of q *)
@@ -560,7 +563,8 @@ module NK_Rel =
                                 in
 		                (true,
                                  partial_v_q || (v_pp && v_qq),
-                                 partial_l_q @
+                                 partial_l_q
+                                 @
                                    (List.map
                                       (fun (n1, k1, f1) ->
                                         (n1, k1 + 1, DIAMOND(LTS.E.label e_p, f1)))
@@ -598,7 +602,7 @@ module NK_Rel =
                         no_table) 
                      else
 	               (partial_v_p && v_q,
-                        partial_l_p @ l_q,  (*this can be
+                        partial_l_p @  l_q,  (*this can be
                                               optimised. A LOT. Here,
                                               we should have only the
                                               min value of (n, k) in
@@ -1204,6 +1208,26 @@ module Test =
         IntIntLTS3.empty
         [(39, 0, 39)]
 
+    let l13 =
+      List.fold_left
+        (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
+        IntIntLTS3.empty
+        [(40, 0, 41);
+         (41, 1, 42);
+         (41, 0, 43);
+         (42, 2, 44)]
+
+    let l14 =
+      List.fold_left
+        (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
+        IntIntLTS3.empty
+        [(45, 0, 46);
+         (45, 0, 47);
+         (46, 1, 48);
+         (47, 1, 49);
+         (47, 0, 50);
+         (48, 2, 51)]
+
     let () =
       IntIntLTS3.iter_vertex
         (function v ->
@@ -1589,5 +1613,20 @@ module Test =
       else
         "test139 failed"
 
-      end)
+    let test140 =
+      match
+        IntIntLTS3NK_Rel.checknkRel
+          l13
+          l14
+          40
+          45
+          2
+          5
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
+          ()
+      with
+      | false -> "test140 passed"
+      | true -> "test140 failed"
 
+      end)
