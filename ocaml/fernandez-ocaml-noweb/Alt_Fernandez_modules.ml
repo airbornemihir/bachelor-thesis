@@ -575,6 +575,27 @@ module NK_Rel =
                                        (n1 + 1, k1 + 1, DIAMOND(LTS.E.label e_q, negation f1)))
                                      l_qq) (* one more round, one more alternation. *)
                                 in
+                                let
+                                    l_pp_qq =
+                                  List.fold_left
+                                   (fun partial_l_pp_qq (n, k, f) ->
+                                     if
+                                       List.exists
+                                         (fun (n1, k1, f1) ->
+                                           (n1 <= n) && (k1 <= k))
+                                         partial_l_pp_qq
+                                     then
+                                       partial_l_pp_qq
+                                     else
+                                       (n, k, f) ::
+                                         (List.filter
+                                            (fun (n1, k1, f1) ->
+                                              (n1 < n) || (k1 < k))
+                                            partial_l_pp_qq)
+                                   )
+                                   []
+                                   (l_pp @ l_qq)
+                                in
 		                (true,
                                  partial_v_q || (v_pp && v_qq),
                                  List.fold_left
@@ -594,7 +615,7 @@ module NK_Rel =
                                             partial_l_q)
                                    )
                                    partial_l_q
-                                   (l_pp @ l_qq),
+                                   l_pp_qq,
                                  yes_table,
                                  no_table
                                 )
