@@ -530,6 +530,13 @@ module NK_Rel =
                                   )
                                 in
                                 let
+                                    l_pp =
+                                  (List.map
+                                     (fun (n1, k1, f1) ->
+                                       (n1, k1 + 1, DIAMOND(LTS.E.label e_p, f1)))
+                                     l_pp) (* one more round. *)
+                                in
+                                let
                                   (* this is when we switch sides.*)
                                     (l_qq,
                                      yes_table,
@@ -561,25 +568,24 @@ module NK_Rel =
                                    | _ -> false
                                   )
                                 in
+                                let
+                                    l_qq =
+                                  (List.map
+                                     (fun (n1, k1, f1) ->
+                                       (n1 + 1, k1 + 1, DIAMOND(LTS.E.label e_q, negation f1)))
+                                     l_qq) (* one more round, one more alternation. *)
+                                in
 		                (true,
                                  partial_v_q || (v_pp && v_qq),
                                  partial_l_q
                                  @
-                                   (List.map
-                                      (fun (n1, k1, f1) ->
-                                        (n1, k1 + 1, DIAMOND(LTS.E.label e_p, f1)))
-                                      l_pp) (* one more round. *)
+                                   l_pp
                                  @
-                                   (List.map
-                                      (fun (n1, k1, f1) ->
-                                        (n1 + 1, k1 + 1, DIAMOND(LTS.E.label e_q, negation f1)))
-                                      l_qq) (* one more round, one more alternation. *)
-                                       (*this can be
-                                       optimised. A LOT. Here,
-                                       we should have only the
-                                       max value of (n, k) in
-                                       cases where a comparison
-                                       is possible.*),
+                                   l_qq (* this can be optimised. A
+                                           LOT. Here, we should have
+                                           only the max value of (n,
+                                           k) in cases where a
+                                           comparison is possible.*),
                                  yes_table,
                                  no_table
                                 )
