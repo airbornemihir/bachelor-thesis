@@ -577,15 +577,24 @@ module NK_Rel =
                                 in
 		                (true,
                                  partial_v_q || (v_pp && v_qq),
-                                 partial_l_q
-                                 @
-                                   l_pp
-                                 @
-                                   l_qq (* this can be optimised. A
-                                           LOT. Here, we should have
-                                           only the max value of (n,
-                                           k) in cases where a
-                                           comparison is possible.*),
+                                 List.fold_left
+                                   (fun partial_l_q (n, k, f) ->
+                                     if
+                                       List.exists
+                                         (fun (n1, k1, f1) ->
+                                           (n1 >= n) && (k1 >= k))
+                                         partial_l_q
+                                     then
+                                       partial_l_q
+                                     else
+                                       (n, k, f) ::
+                                         (List.filter
+                                            (fun (n1, k1, f1) ->
+                                              (n1 > n) || (k1 > k))
+                                            partial_l_q)
+                                   )
+                                   partial_l_q
+                                   (l_pp @ l_qq),
                                  yes_table,
                                  no_table
                                 )
@@ -608,12 +617,24 @@ module NK_Rel =
                         no_table) 
                      else
 	               (partial_v_p && v_q,
-                        partial_l_p @  l_q,  (*this can be
-                                              optimised. A LOT. Here,
-                                              we should have only the
-                                              min value of (n, k) in
-                                              cases where a comparison
-                                              is possible.*)
+                        List.fold_left
+                          (fun partial_l_p (n, k, f) ->
+                            if
+                              (List.exists
+                                 (fun (n1, k1, f1) ->
+                                   (n1 <= n) && (k1 <= k))
+                                 partial_l_p)
+                            then
+                              partial_l_p
+                            else
+                              (n, k, f) ::
+                                (List.filter
+                                   (fun (n1, k1, f1) ->
+                                     (n1 < n) || (k1 < k))
+                                   partial_l_p)
+                          )
+                          partial_l_p
+                          l_q,  
                         yes_table,
                         no_table
                        )
@@ -626,7 +647,7 @@ module NK_Rel =
               if
                 v_p
               then
-	        (l_p,
+	        ([], (* earlier this was l_p, which seems wrong.*)
                  yes_table,
                  no_table)
               else
