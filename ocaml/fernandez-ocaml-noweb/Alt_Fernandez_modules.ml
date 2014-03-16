@@ -1276,6 +1276,17 @@ module Test =
          (47, 0, 50);
          (48, 2, 51)]
 
+    let l15 =
+      List.fold_left
+        (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
+        IntIntLTS3.empty
+        [(52, 0, 53);
+         (52, 0, 54);
+         (53, 1, 55);
+         (53, 0, 56);
+         (54, 2, 57);
+         (55, 2, 58)]
+
     let () =
       IntIntLTS3.iter_vertex
         (function v ->
@@ -1676,5 +1687,21 @@ module Test =
       with
       | false -> "test140 passed"
       | true -> "test140 failed"
+
+    let test141 =
+      match
+        IntIntLTS3NK_Rel.checknkRel
+          l15
+          l14
+          52
+          45
+          2
+          5
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
+          ()
+      with
+      | false -> "test141 passed"
+      | true -> "test141 failed"
 
       end)
