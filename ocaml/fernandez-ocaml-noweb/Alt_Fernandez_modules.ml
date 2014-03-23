@@ -599,28 +599,66 @@ module NK_Rel =
                                 let
                                     partial_v_q = partial_v_q || (v_pp && v_qq)
                                 in
+                                let
+                                    partial_l_q =
+                                  (if
+                                      partial_v_q
+                                   then
+                                      []
+                                   else
+                                      (List.concat
+                                         (List.map
+                                            (function (n, k, f) ->
+                                              List.map
+                                                (function
+                                              (max_n,
+                                               max_k,
+                                               formula_list) ->
+                                                ((if
+                                                    max_n < n
+                                                  then n
+                                                  else max_n),
+                                                 (if
+                                                    max_k < k
+                                                  then k
+                                                  else max_k),
+                                                 f::formula_list))
+                                                partial_l_q
+                                            )
+                                            l_pp_qq)))
+                                in
 		                (true,
                                  partial_v_q,
-                                 (if
-                                     partial_v_q
-                                  then
-                                     []
-                                  else
-                                     (List.concat
-                                        (List.map
-                                           (function (n, k, f) ->
-                                             List.map
-                                               (function list_for_and -> (n, k, f)::list_for_and)
-                                               partial_l_q
-                                           )
-                                           l_pp_qq))),
+                                 (List.fold_left
+                                    (fun partial_l_q (n, k, f) ->
+                                      if
+                                        List.exists
+                                          (fun (n1, k1, f1) ->
+                                            (n1 <= n) && (k1 <= k))
+                                          partial_l_q
+                                      then
+                                        partial_l_q
+                                      else
+                                        (n, k, f)::
+                                          (List.filter
+                                             (fun (n1, k1, f1) ->
+                                               (n1 < n) || (k1 < k))
+                                             partial_l_q
+                                          )
+                                    )
+                                    []
+                                    partial_l_q), (* this is where we
+                                                     get rid of cruft
+                                                     in the cartesian
+                                                     product we have
+                                                     built so far.*)
                                  yes_table,
                                  no_table
                                 )
 		          )
 		          lts2
 		          q
-		          (false, false, [[]], yes_table, no_table)
+		          (false, false, [(0, 0, [])], yes_table, no_table)
 	               )
                      in
                      let
@@ -629,58 +667,44 @@ module NK_Rel =
                        if
                          (not match_found)
                        then
-                         [(0, 1, DIAMOND(LTS.E.label e_p, AND []))]
+                         (* this is the base case for entry into the
+                            no_table. The challenger can perform one move
+                            right here which the defender cannot
+                            replicate. *)
+                         (* [(0, 1, [DIAMOND(LTS.E.label e_p, AND[])])] *)
+                         [(0, 1, [AND[]])]
                        else
-                         (List.map
-                            (function nkf_list ->
-                              let
-                                  (n, k, formula_list) =
-                                List.fold_left
-                                  (fun (max_n, max_k, formula_list) (n, k, f) ->
-                                  ((if max_n < n then n else max_n),
-                                   (if max_k < k then k else max_k),
-                                   f::formula_list))
-                                  (0, 0, [])
-                                  nkf_list
-                              in
-                              (n, k, DIAMOND(LTS.E.label e_p, AND formula_list)))
-                            l_q
-                         )
+                         l_q
                      in
-                     if
-                       (not match_found)
-                     then
-                     (* this is the base case for entry into the
-                        no_table. The challenger can perform one move
-                        right here which the defender cannot
-                        replicate. *)
-                       (false,
-                        (0, 1, DIAMOND(LTS.E.label e_p, AND [])) :: l_q,
-                        yes_table,
-                        no_table) 
-                     else
-	               (partial_v_p && v_q,
-                        List.fold_left
-                          (fun partial_l_p (n, k, f) ->
-                            if
-                              (List.exists
+	             (partial_v_p && v_q, (* this expression works
+                                             fine even for the case
+                                             where we have
+                                             match_found = false,
+                                             because there is a
+                                             false in the base case
+                                             which makes the and
+                                             thingy false as well. *)
+                      List.fold_left
+                        (fun partial_l_p (n, k, formula_list) ->
+                          if
+                            (List.exists
+                               (fun (n1, k1, f1) ->
+                                 (n1 <= n) && (k1 <= k))
+                               partial_l_p)
+                          then
+                            partial_l_p
+                          else
+                            (n, k, DIAMOND (LTS.E.label e_p, AND formula_list)) ::
+                              (List.filter
                                  (fun (n1, k1, f1) ->
-                                   (n1 <= n) && (k1 <= k))
+                                   (n1 < n) || (k1 < k))
                                  partial_l_p)
-                            then
-                              partial_l_p
-                            else
-                              (n, k, f) ::
-                                (List.filter
-                                   (fun (n1, k1, f1) ->
-                                     (n1 < n) || (k1 < k))
-                                   partial_l_p)
-                          )
-                          partial_l_p
-                          l_q,  
-                        yes_table,
-                        no_table
-                       )
+                        )
+                        partial_l_p
+                        l_q,  
+                      yes_table,
+                      no_table
+                     )
 	           )
 	           lts1
 	           p
@@ -1278,6 +1302,7 @@ module Test =
         IntIntLTS3.empty
         [(39, 0, 39)]
 
+    (* l13 and l14 correspond to the file 0alternation.pdf. *)
     let l13 =
       List.fold_left
         (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
