@@ -487,8 +487,8 @@ module NK_Rel =
                          (match_found, v_q, l_q,
                           yes_table,
                           no_table) =
-                     (* This fold deals with all the successors of q,
-                        existential quantification.*)
+                       (* This fold deals with all the successors of q,
+                          existential quantification.*)
                        (LTS.fold_succ_e
 		          (fun e_q
                             (partial_match_found,
@@ -537,7 +537,7 @@ module NK_Rel =
                                      l_pp) (* one more round. *)
                                 in
                                 let
-                                  (* this is when we switch sides.*)
+                                    (* this is when we switch sides.*)
                                     (l_qq,
                                      yes_table,
                                      no_table) =
@@ -578,52 +578,74 @@ module NK_Rel =
                                 let
                                     l_pp_qq =
                                   List.fold_left
-                                   (fun partial_l_pp_qq (n, k, f) ->
-                                     if
-                                       List.exists
-                                         (fun (n1, k1, f1) ->
-                                           (n1 <= n) && (k1 <= k))
-                                         partial_l_pp_qq
-                                     then
-                                       partial_l_pp_qq
-                                     else
-                                       (n, k, f) ::
-                                         (List.filter
-                                            (fun (n1, k1, f1) ->
-                                              (n1 < n) || (k1 < k))
-                                            partial_l_pp_qq)
-                                   )
-                                   []
-                                   (l_pp @ l_qq)
+                                    (fun partial_l_pp_qq (n, k, f) ->
+                                      if
+                                        List.exists
+                                          (fun (n1, k1, f1) ->
+                                            (n1 <= n) && (k1 <= k))
+                                          partial_l_pp_qq
+                                      then
+                                        partial_l_pp_qq
+                                      else
+                                        (n, k, f) ::
+                                          (List.filter
+                                             (fun (n1, k1, f1) ->
+                                               (n1 < n) || (k1 < k))
+                                             partial_l_pp_qq)
+                                    )
+                                    []
+                                    (l_pp @ l_qq)
+                                in
+                                let
+                                    partial_v_q = partial_v_q || (v_pp && v_qq)
                                 in
 		                (true,
-                                 partial_v_q || (v_pp && v_qq),
-                                 List.fold_left
-                                   (fun partial_l_q (n, k, f) ->
-                                     if
-                                       List.exists
-                                         (fun (n1, k1, f1) ->
-                                           (n1 >= n) && (k1 >= k))
-                                         partial_l_q
-                                     then
-                                       partial_l_q
-                                     else
-                                       (n, k, f) ::
-                                         (List.filter
-                                            (fun (n1, k1, f1) ->
-                                              (n1 > n) || (k1 > k))
-                                            partial_l_q)
-                                   )
-                                   partial_l_q
-                                   l_pp_qq,
+                                 partial_v_q,
+                                 (if
+                                     partial_v_q
+                                  then
+                                     []
+                                  else
+                                     (List.concat
+                                        (List.map
+                                           (function (n, k, f) ->
+                                             List.map
+                                               (function list_for_and -> (n, k, f)::list_for_and)
+                                               partial_l_q
+                                           )
+                                           l_pp_qq))),
                                  yes_table,
                                  no_table
                                 )
 		          )
 		          lts2
 		          q
-		          (false, false, [], yes_table, no_table)
+		          (false, false, [[]], yes_table, no_table)
 	               )
+                     in
+                     let
+                         l_q
+                         =
+                       if
+                         (not match_found)
+                       then
+                         [(0, 1, DIAMOND(LTS.E.label e_p, AND []))]
+                       else
+                         (List.map
+                            (function nkf_list ->
+                              let
+                                  (n, k, formula_list) =
+                                List.fold_left
+                                  (fun (max_n, max_k, formula_list) (n, k, f) ->
+                                  ((if max_n < n then n else max_n),
+                                   (if max_k < k then k else max_k),
+                                   f::formula_list))
+                                  (0, 0, [])
+                                  nkf_list
+                              in
+                              (n, k, DIAMOND(LTS.E.label e_p, AND formula_list)))
+                            l_q
+                         )
                      in
                      if
                        (not match_found)
