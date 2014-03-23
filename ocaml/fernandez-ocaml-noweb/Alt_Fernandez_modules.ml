@@ -533,7 +533,7 @@ module NK_Rel =
                                     l_pp =
                                   (List.map
                                      (fun (n1, k1, f1) ->
-                                       (n1, k1 + 1, DIAMOND(LTS.E.label e_p, f1)))
+                                       (n1, k1 + 1, f1))
                                      l_pp) (* one more round. *)
                                 in
                                 let
@@ -572,7 +572,7 @@ module NK_Rel =
                                     l_qq =
                                   (List.map
                                      (fun (n1, k1, f1) ->
-                                       (n1 + 1, k1 + 1, DIAMOND(LTS.E.label e_q, negation f1)))
+                                       (n1 + 1, k1 + 1, negation f1))
                                      l_qq) (* one more round, one more alternation. *)
                                 in
                                 let
