@@ -1334,6 +1334,63 @@ module Test =
          (54, 2, 57);
          (55, 2, 58)]
 
+    let l16 =
+      List.fold_left
+        (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
+        IntIntLTS3.empty
+        [(59, 0, 60)]
+
+    let l17 =
+      List.fold_left
+        (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
+        (IntIntLTS3.add_vertex IntIntLTS3.empty 61)
+        []
+
+    let l18 =
+      List.fold_left
+        (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
+        IntIntLTS3.empty
+        [(62, 0, 63);
+         (63, 0, 64);
+         (64, 1, 65);
+         (65, 2, 66)]
+
+    let l19 =
+      List.fold_left
+        (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
+        IntIntLTS3.empty
+        [(62, 0, 63);
+         (63, 0, 64);
+         (64, 1, 65);
+         (65, 2, 66);
+         (62, 0, 67);
+         (67, 1, 68)]
+
+    let l20 =
+      List.fold_left
+        (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
+        IntIntLTS3.empty
+        [(69, 0, 70);
+         (69, 0, 71);
+         (70, 0, 72);
+         (71, 0, 73);
+         (72, 1, 74);
+         (73, 1, 75);
+         (73, 3, 76)]
+
+    let l21 =
+      List.fold_left
+        (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
+        IntIntLTS3.empty
+        [(69, 0, 70);
+         (69, 0, 71);
+         (70, 0, 72);
+         (71, 0, 73);
+         (72, 1, 74);
+         (73, 1, 75);
+         (73, 3, 76);
+         (75, 2, 77)]
+
     let () =
       IntIntLTS3.iter_vertex
         (function v ->
@@ -1750,5 +1807,69 @@ module Test =
       with
       | false -> "test141 passed"
       | true -> "test141 failed"
+
+    let test142 =
+      match
+        IntIntLTS3NK_Rel.checknkRel
+          l16
+          l17
+          59
+          61
+          2
+          5
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
+          ()
+      with
+      | false -> "test142 passed"
+      | true -> "test142 failed"
+
+    let test143 =
+      match
+        IntIntLTS3NK_Rel.checknkRel
+          l18
+          l20
+          62
+          69
+          2
+          5
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
+          ()
+      with
+      | false -> "test143 passed"
+      | true -> "test143 failed"
+
+    let test144 =
+      match
+        IntIntLTS3NK_Rel.checknkRel
+          l18
+          l21
+          62
+          69
+          2
+          5
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
+          ()
+      with
+      | false -> "test144 passed"
+      | true -> "test144 failed"
+
+    let test145 =
+      match
+        IntIntLTS3NK_Rel.checknkRel
+          l19
+          l20
+          62
+          69
+          2
+          5
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
+          ()
+      with
+      | false -> "test145 passed"
+      | true -> "test145 failed"
 
       end)
