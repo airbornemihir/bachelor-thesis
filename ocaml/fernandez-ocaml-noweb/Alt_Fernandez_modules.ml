@@ -592,19 +592,6 @@ module NK_Rel =
                                     (l_pp @ l_qq)
                                 in
                                 let
-                                    () =
-                                  Printf.printf
-                                    "p = %s, q = %s, p successor = %s, q successor = %s\nList.length l_pp = %s, List.length l_qq = %s, List.length l_pp_qq = %s, List.length partial_l_q = %s\n"
-                                    (LTS.vertex_name p)
-                                    (LTS.vertex_name q)
-                                    (LTS.vertex_name (LTS.E.dst e_p))
-                                    (LTS.vertex_name (LTS.E.dst e_q))
-                                    (string_of_int (List.length l_pp))
-                                    (string_of_int (List.length l_qq))
-                                    (string_of_int (List.length l_pp_qq))
-                                    (string_of_int (List.length partial_l_q))
-                                in
-                                let
                                     partial_v_q = partial_v_q || (v_pp && v_qq)
                                 in
                                 let
@@ -635,12 +622,6 @@ module NK_Rel =
                                             )
                                             l_pp_qq)))
                                 in
-                                let
-                                    () =
-                                  Printf.printf
-                                    "List.length partial_l_q = %s\n"
-                                    (string_of_int (List.length partial_l_q))
-                                in
                                 (* this is where we get rid of cruft
                                    in the cartesian product we have
                                    built so far.*)
@@ -665,12 +646,6 @@ module NK_Rel =
                                      )
                                      []
                                      partial_l_q)
-                                in
-                                let
-                                    () =
-                                  Printf.printf
-                                    "List.length partial_l_q = %s\n"
-                                    (string_of_int (List.length partial_l_q))
                                 in
 		                (true,
                                  partial_v_q,
