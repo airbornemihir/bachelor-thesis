@@ -461,11 +461,6 @@ module NK_Rel =
         let
             result = (
           if k = 0 then ([], yes_table, no_table)
-          (* The function checkEntry checks if there is at least one
-             entry for p, q with both remaining number of alternations
-             and remaining number of rounds to be greater than n and k
-             respectively. If not then p, q with current n, k values
-             are added in the function getEntry and *)
           else if check_entry_yes_table yes_table p q n k  
           then ([], yes_table, no_table)
           else
@@ -597,6 +592,19 @@ module NK_Rel =
                                     (l_pp @ l_qq)
                                 in
                                 let
+                                    () =
+                                  Printf.printf
+                                    "p = %s, q = %s, p successor = %s, q successor = %s\nList.length l_pp = %s, List.length l_qq = %s, List.length l_pp_qq = %s, List.length partial_l_q = %s\n"
+                                    (LTS.vertex_name p)
+                                    (LTS.vertex_name q)
+                                    (LTS.vertex_name (LTS.E.dst e_p))
+                                    (LTS.vertex_name (LTS.E.dst e_q))
+                                    (string_of_int (List.length l_pp))
+                                    (string_of_int (List.length l_qq))
+                                    (string_of_int (List.length l_pp_qq))
+                                    (string_of_int (List.length partial_l_q))
+                                in
+                                let
                                     partial_v_q = partial_v_q || (v_pp && v_qq)
                                 in
                                 let
@@ -619,7 +627,7 @@ module NK_Rel =
                                                   then n
                                                   else max_n),
                                                  (if
-                                                    max_k < k
+                                                     max_k < k
                                                   then k
                                                   else max_k),
                                                  f::formula_list))
@@ -627,31 +635,46 @@ module NK_Rel =
                                             )
                                             l_pp_qq)))
                                 in
+                                let
+                                    () =
+                                  Printf.printf
+                                    "List.length partial_l_q = %s\n"
+                                    (string_of_int (List.length partial_l_q))
+                                in
+                                (* this is where we get rid of cruft
+                                   in the cartesian product we have
+                                   built so far.*)
+                                let
+                                    partial_l_q =
+                                  (List.fold_left
+                                     (fun partial_l_q (n, k, f) ->
+                                       if
+                                         List.exists
+                                           (fun (n1, k1, f1) ->
+                                             (n1 <= n) && (k1 <= k))
+                                           partial_l_q
+                                       then
+                                         partial_l_q
+                                       else
+                                         (n, k, f)::
+                                           (List.filter
+                                              (fun (n1, k1, f1) ->
+                                                (n1 < n) || (k1 < k))
+                                              partial_l_q
+                                           )
+                                     )
+                                     []
+                                     partial_l_q)
+                                in
+                                let
+                                    () =
+                                  Printf.printf
+                                    "List.length partial_l_q = %s\n"
+                                    (string_of_int (List.length partial_l_q))
+                                in
 		                (true,
                                  partial_v_q,
-                                 (List.fold_left
-                                    (fun partial_l_q (n, k, f) ->
-                                      if
-                                        List.exists
-                                          (fun (n1, k1, f1) ->
-                                            (n1 <= n) && (k1 <= k))
-                                          partial_l_q
-                                      then
-                                        partial_l_q
-                                      else
-                                        (n, k, f)::
-                                          (List.filter
-                                             (fun (n1, k1, f1) ->
-                                               (n1 < n) || (k1 < k))
-                                             partial_l_q
-                                          )
-                                    )
-                                    []
-                                    partial_l_q), (* this is where we
-                                                     get rid of cruft
-                                                     in the cartesian
-                                                     product we have
-                                                     built so far.*)
+                                 partial_l_q, 
                                  yes_table,
                                  no_table
                                 )
@@ -1391,6 +1414,17 @@ module Test =
          (73, 3, 76);
          (75, 2, 77)]
 
+    let l22 =
+      List.fold_left
+        (fun g (src, label, dst) -> IntIntLTS3.add_edge_e g (IntIntLTS3.E.create src label dst))
+        IntIntLTS3.empty
+        [(69, 0, 70);
+         (69, 0, 71);
+         (70, 0, 72);
+         (71, 0, 73);
+         (73, 1, 75);
+         (73, 3, 76)]
+
     let () =
       IntIntLTS3.iter_vertex
         (function v ->
@@ -1871,5 +1905,21 @@ module Test =
       with
       | false -> "test145 passed"
       | true -> "test145 failed"
+
+    let test146 =
+      match
+        IntIntLTS3NK_Rel.checknkRel
+          l18
+          l22
+          62
+          69
+          2
+          5
+          (IntIntLTS3NK_Rel.create_yes_table ())
+          (IntIntLTS3NK_Rel.create_no_table ())
+          ()
+      with
+      | false -> "test146 passed"
+      | true -> "test146 failed"
 
       end)
