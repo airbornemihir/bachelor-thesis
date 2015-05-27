@@ -1,9 +1,9 @@
-bachelor-thesis
+reltool
 ===============
 
 Pre-installation steps:
 
-- Get G++, Make, Ocaml (including Findlib), Git, Noweb and Ocamlgraph.
+- Get G++, Make, Automake, Ocaml (including Findlib), Git, Noweb and Ocamlgraph.
 
 - Get the UPPAAL DBM library, from
   https://github.com/airbornemihir/uppaal-dbm. v2.0.8-reltool2 is
@@ -18,16 +18,16 @@ Installation steps:
 
 - You can download the latest development sources by cloning the git
   repository.
-$ git clone https://github.com/airbornemihir/bachelor-thesis.git
+$ git clone https://github.com/sguha100/reltool.git
   Alternatively, you can download a zip file
-  (https://github.com/airbornemihir/bachelor-thesis/archive/master.zip)
+  (https://github.com/sguha100/reltool/archive/master.zip)
   or a tarball
-  (https://github.com/airbornemihir/bachelor-thesis/archive/master.tar.gz)
+  (https://github.com/sguha100/reltool/archive/master.tar.gz)
   of the latest development sources if you do not wish to use git or
   clone the entire repository.
   Alternatively, you can download a tarball/zip archive from the
   releases page
-  (https://github.com/airbornemihir/bachelor-thesis/releases) if you
+  (https://github.com/sguha100/reltool/releases) if you
   do not wish to use development sources.
 - run
 $ LIBS="-lstdc++" ./configure
@@ -38,10 +38,10 @@ $ LDFLAGS="-L$HOME/uppaal/lib" CPPFLAGS="-I$HOME/uppaal/include" LIBS="-lstdc++"
 $ LDFLAGS="-L/usr/local/uppaal/lib" CPPFLAGS="-I/usr/local/uppaal/include" LIBS="-lstdc++" ./configure
   After this, you can run
 $ make
-$ make install
+$ make install (make install needs to be a the root user and hence issue $ su if not already running as root.)
   Note that VPATH builds are not supported for now.
 
-- Now, try running an example. Here, we select breaking2.txt. Run 'calc < grammar-noweb/examples/breaking2.txt'.
+- Now, try running an example. Here, we select static_guard_analysis_example1.txt. Run 'calc < grammar-noweb/examples/static_guard_analysis_example1.txt'.
 
 - This generates 4 files in /tmp.
 -- /tmp/lts.txt
